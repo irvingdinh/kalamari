@@ -5,7 +5,7 @@
   "author": "Irving Dinh <irving.dinh@gmail.com>",
   "license": "MIT",
   "bin": {
-    "kalamari": "./dist/cli.js"
+    "kalamari": "./dist/main.js"
   },
   "main": "./dist/main.js",
   "files": [
