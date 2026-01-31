@@ -1,5 +1,6 @@
 import { Module } from '@nestjs/common';
 
+import { CoreModule } from '../core/core.module';
 import {
   adapters,
   ClaudeAdapter,
@@ -11,6 +12,7 @@ import { services } from './services';
 import { CLI_ADAPTERS } from './services/cli-registry.service';
 
 @Module({
+  imports: [CoreModule],
   providers: [
     ...adapters,
     ...services,

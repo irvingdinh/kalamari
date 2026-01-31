@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 
+import { DirService } from '../../core/services/dir.service';
 import { CliType } from '../types';
 import { CliAdapter, ExecResult } from './cli.adapter';
 
@@ -7,7 +8,11 @@ import { CliAdapter, ExecResult } from './cli.adapter';
 export class ClaudeAdapter extends CliAdapter {
   readonly type = CliType.Claude;
 
-  async ping(): Promise<ExecResult> {
+  constructor(private readonly dirService: DirService) {
+    super();
+  }
+
+  async ping(cwd?: string): Promise<ExecResult> {
     return this.exec({
       command: 'claude',
       args: [
@@ -18,14 +23,16 @@ export class ClaudeAdapter extends CliAdapter {
         'stream-json',
         '--print',
       ],
+      cwd: cwd ?? this.dirService.ensureTempDir(),
       stdin: 'Please say "PONG", thanks',
     });
   }
 
-  async version(): Promise<ExecResult> {
+  async version(cwd?: string): Promise<ExecResult> {
     const result = await this.exec({
       command: 'claude',
       args: ['--version'],
+      cwd: cwd ?? this.dirService.ensureTempDir(),
     });
 
     return {

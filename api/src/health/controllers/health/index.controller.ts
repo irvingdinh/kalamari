@@ -3,10 +3,14 @@ import type { Response } from 'express';
 
 import { CliHealthStatus } from '../../../cli/adapters';
 import { CliRegistryService } from '../../../cli/services/cli-registry.service';
+import { DirService } from '../../../core/services/dir.service';
 
 @Controller('/api/health')
 export class IndexController {
-  constructor(private readonly cliRegistry: CliRegistryService) {}
+  constructor(
+    private readonly cliRegistry: CliRegistryService,
+    private readonly dirService: DirService,
+  ) {}
 
   @Get()
   async invoke(@Res() res: Response) {
@@ -16,7 +20,8 @@ export class IndexController {
   }
 
   private async getCliHealth(): Promise<CliHealthStatus[]> {
+    const cwd = this.dirService.ensureTempDir();
     const adapters = this.cliRegistry.getAll();
-    return Promise.all(adapters.map((adapter) => adapter.getHealth()));
+    return Promise.all(adapters.map((adapter) => adapter.getHealth(cwd)));
   }
 }

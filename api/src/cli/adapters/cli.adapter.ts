@@ -5,6 +5,7 @@ import { CliType } from '../types';
 export interface ExecOptions {
   command: string;
   args: string[];
+  cwd: string;
   stdin?: string;
   onStdout?: (chunk: string) => void;
   onStderr?: (chunk: string) => void;
@@ -25,11 +26,11 @@ export interface CliHealthStatus {
 export abstract class CliAdapter {
   abstract readonly type: CliType;
 
-  abstract ping(): Promise<ExecResult>;
-  abstract version(): Promise<ExecResult>;
+  abstract ping(cwd?: string): Promise<ExecResult>;
+  abstract version(cwd?: string): Promise<ExecResult>;
 
   protected async exec(options: ExecOptions): Promise<ExecResult> {
-    const { command, args, stdin, onStdout, onStderr } = options;
+    const { command, args, cwd, stdin, onStdout, onStderr } = options;
 
     return new Promise((resolve) => {
       let stdout = '';
@@ -37,7 +38,7 @@ export abstract class CliAdapter {
       let exitCode = 1;
 
       try {
-        const child = spawn(command, args);
+        const child = spawn(command, args, { cwd });
 
         child.stdout.on('data', (data: Buffer) => {
           const chunk = data.toString();
@@ -72,10 +73,10 @@ export abstract class CliAdapter {
     });
   }
 
-  async getHealth(): Promise<CliHealthStatus> {
+  async getHealth(cwd?: string): Promise<CliHealthStatus> {
     const [pingResult, versionResult] = await Promise.all([
-      this.ping(),
-      this.version(),
+      this.ping(cwd),
+      this.version(cwd),
     ]);
 
     return {

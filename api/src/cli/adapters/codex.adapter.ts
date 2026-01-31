@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 
+import { DirService } from '../../core/services/dir.service';
 import { CliType } from '../types';
 import { CliAdapter, ExecResult } from './cli.adapter';
 
@@ -7,18 +8,24 @@ import { CliAdapter, ExecResult } from './cli.adapter';
 export class CodexAdapter extends CliAdapter {
   readonly type = CliType.Codex;
 
-  async ping(): Promise<ExecResult> {
+  constructor(private readonly dirService: DirService) {
+    super();
+  }
+
+  async ping(cwd?: string): Promise<ExecResult> {
     return this.exec({
       command: 'codex',
-      args: ['--model', 'gpt-5.1-codex-mini', 'exec'],
+      args: ['--model', 'gpt-5-nano', 'exec', '--skip-git-repo-check'],
+      cwd: cwd ?? this.dirService.ensureTempDir(),
       stdin: 'Please say "PONG", thanks',
     });
   }
 
-  async version(): Promise<ExecResult> {
+  async version(cwd?: string): Promise<ExecResult> {
     const result = await this.exec({
       command: 'codex',
       args: ['--version'],
+      cwd: cwd ?? this.dirService.ensureTempDir(),
     });
 
     return {
