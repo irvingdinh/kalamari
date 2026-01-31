@@ -9,6 +9,9 @@ export interface AppConfig {
   dir: {
     data: string;
   };
+  processor: {
+    disabled: boolean;
+  };
 }
 
 export const config = (): { root: AppConfig } => ({
@@ -19,6 +22,9 @@ export const config = (): { root: AppConfig } => ({
     },
     dir: {
       data: getDataDir(),
+    },
+    processor: {
+      disabled: process.env.KALAMARI_PROCESSOR_DISABLED === '1',
     },
   },
 });

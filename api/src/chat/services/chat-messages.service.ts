@@ -78,10 +78,6 @@ export class ChatMessagesService {
 
     const savedMessage = await this.messageRepository.save(message);
 
-    // Update chat's updatedAt to bring it to the top of the list
-    await this.chatRepository.update({ id: chatId }, { updatedAt: new Date() });
-
-    // Create queue for user message
     const queue = this.queueRepository.create({
       id: nanoid(),
       chatId,

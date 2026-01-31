@@ -16,6 +16,9 @@ export async function createTestApp(): Promise<NestApplication> {
   if (env.PORT === 0) env.PORT = await getAvailablePort();
   if (env.TEMP_DATA_DIR === '') env.TEMP_DATA_DIR = ensureTempDataDir();
 
+  // Disable the processor
+  process.env.KALAMARI_PROCESSOR_DISABLED = '1';
+
   const app: NestApplication = await NestFactory.create(AppModule, {
     logger: ['error'],
   });
