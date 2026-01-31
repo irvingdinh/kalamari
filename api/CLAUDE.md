@@ -1,5 +1,9 @@
 # api
 
+## Coding
+
+- Always run `cd .. && make check` after implementing any coding task to verify linting and tests pass.
+
 ## Testing
 
 ### Test Structure

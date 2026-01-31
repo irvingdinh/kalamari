@@ -16,7 +16,9 @@ export async function createTestApp(): Promise<NestApplication> {
   if (env.PORT === 0) env.PORT = await getAvailablePort();
   if (env.TEMP_DATA_DIR === '') env.TEMP_DATA_DIR = ensureTempDataDir();
 
-  const app: NestApplication = await NestFactory.create(AppModule);
+  const app: NestApplication = await NestFactory.create(AppModule, {
+    logger: ['error'],
+  });
   app.useGlobalPipes(new ValidationPipe({ transform: true }));
   await app.listen(env.PORT);
 
