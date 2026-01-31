@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { existsSync, mkdirSync, writeFileSync } from 'fs';
+import { mkdirSync } from 'fs';
 import { nanoid } from 'nanoid';
 import { tmpdir } from 'os';
 import { join } from 'path';

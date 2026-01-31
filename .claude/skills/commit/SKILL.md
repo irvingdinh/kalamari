@@ -5,9 +5,10 @@ description: Commit the Git changes
 
 ## Instructions
 
-1. **Review changes**: Run `git status` and `git diff` to understand all staged and unstaged changes
-2. **Stage changes**: Stage all modified and untracked files (excluding files that should be ignored like `.env`, credentials, etc.)
-3. **Write commit message**: Create a commit message following Conventional Commits format:
+1. **Stage all changes**: Run `git add -A` to stage all modified and untracked files
+2. **Review changes**: Run `git status` and `git diff --staged` to understand all staged changes
+3. **Run checks**: Execute `make check` to ensure all tests and linting pass before proceeding. If checks fail, fix the issues before continuing.
+4. **Write commit message**: Create a commit message following Conventional Commits format:
    - `feat:` for new features
    - `fix:` for bug fixes
    - `docs:` for documentation changes
@@ -17,7 +18,7 @@ description: Commit the Git changes
    - Use imperative mood (e.g., "Add feature" not "Added feature")
    - Keep the subject line concise (under 72 characters)
    - Add body if needed to explain the "why"
-4. **Commit**: Execute the commit with Co-Authored-By trailer
+5. **Commit**: Execute the commit with Co-Authored-By trailer
 
 ## Commit Message Format
 
