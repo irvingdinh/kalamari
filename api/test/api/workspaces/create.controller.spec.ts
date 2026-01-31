@@ -57,6 +57,28 @@ describe('POST /api/workspaces', () => {
 
       expect(res1.data.id).not.toBe(res2.data.id);
     });
+
+    it('should create a workspace with description and workingDirectory', async () => {
+      const res = await axios.post(withUrl('/api/workspaces'), {
+        name: 'New Workspace',
+        description: 'A test workspace description',
+        workingDirectory: '/tmp/workspace',
+      });
+
+      expect(res.status).toBe(201);
+      expect(res.data.description).toBe('A test workspace description');
+      expect(res.data.workingDirectory).toBe('/tmp/workspace');
+    });
+
+    it('should create a workspace with null description and workingDirectory when not provided', async () => {
+      const res = await axios.post(withUrl('/api/workspaces'), {
+        name: 'Minimal Workspace',
+      });
+
+      expect(res.status).toBe(201);
+      expect(res.data.description).toBeNull();
+      expect(res.data.workingDirectory).toBeNull();
+    });
   });
 
   describe('validation', () => {
@@ -115,6 +137,36 @@ describe('POST /api/workspaces', () => {
 
       expect(res.status).toBe(201);
       expect(res.data.name).toBe('a'.repeat(255));
+    });
+
+    it('should return 400 when description exceeds 1000 characters', async () => {
+      try {
+        await axios.post(withUrl('/api/workspaces'), {
+          name: 'Test',
+          description: 'a'.repeat(1001),
+        });
+        fail('Expected request to fail');
+      } catch (error: any) {
+        expect(error.response.status).toBe(400);
+        expect(error.response.data.message).toContain(
+          'description must be shorter than or equal to 1000 characters',
+        );
+      }
+    });
+
+    it('should return 400 when workingDirectory exceeds 255 characters', async () => {
+      try {
+        await axios.post(withUrl('/api/workspaces'), {
+          name: 'Test',
+          workingDirectory: 'a'.repeat(256),
+        });
+        fail('Expected request to fail');
+      } catch (error: any) {
+        expect(error.response.status).toBe(400);
+        expect(error.response.data.message).toContain(
+          'workingDirectory must be shorter than or equal to 255 characters',
+        );
+      }
     });
   });
 });

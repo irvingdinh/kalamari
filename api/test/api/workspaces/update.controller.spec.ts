@@ -60,7 +60,7 @@ describe('PATCH /api/workspaces/:id', () => {
       expect(updated?.name).toBe('Persisted Update');
     });
 
-    it('should return 400 when body is empty', async () => {
+    it('should return 200 when body is empty (no-op update)', async () => {
       const repo = dataSource.getRepository(WorkspaceEntity);
       const workspace = repo.create({
         id: nanoid(),
@@ -68,15 +68,13 @@ describe('PATCH /api/workspaces/:id', () => {
       });
       await repo.save(workspace);
 
-      try {
-        await axios.patch(withUrl(`/api/workspaces/${workspace.id}`), {});
-        fail('Expected request to fail');
-      } catch (error: any) {
-        expect(error.response.status).toBe(400);
-        expect(error.response.data.message).toContain(
-          'name should not be empty',
-        );
-      }
+      const res = await axios.patch(
+        withUrl(`/api/workspaces/${workspace.id}`),
+        {},
+      );
+
+      expect(res.status).toBe(200);
+      expect(res.data.name).toBe('Original Name');
     });
 
     it('should update the updatedAt timestamp', async () => {
@@ -104,6 +102,64 @@ describe('PATCH /api/workspaces/:id', () => {
       expect(new Date(res.data.updatedAt as string).getTime()).toBeGreaterThan(
         pastDate.getTime(),
       );
+    });
+
+    it('should update the workspace description', async () => {
+      const repo = dataSource.getRepository(WorkspaceEntity);
+      const workspace = repo.create({
+        id: nanoid(),
+        name: 'Test Workspace',
+      });
+      await repo.save(workspace);
+
+      const res = await axios.patch(
+        withUrl(`/api/workspaces/${workspace.id}`),
+        { description: 'Updated description' },
+      );
+
+      expect(res.status).toBe(200);
+      expect(res.data.description).toBe('Updated description');
+      expect(res.data.name).toBe('Test Workspace');
+    });
+
+    it('should update the workspace workingDirectory', async () => {
+      const repo = dataSource.getRepository(WorkspaceEntity);
+      const workspace = repo.create({
+        id: nanoid(),
+        name: 'Test Workspace',
+      });
+      await repo.save(workspace);
+
+      const res = await axios.patch(
+        withUrl(`/api/workspaces/${workspace.id}`),
+        { workingDirectory: '/new/path' },
+      );
+
+      expect(res.status).toBe(200);
+      expect(res.data.workingDirectory).toBe('/new/path');
+    });
+
+    it('should update multiple fields at once', async () => {
+      const repo = dataSource.getRepository(WorkspaceEntity);
+      const workspace = repo.create({
+        id: nanoid(),
+        name: 'Original Name',
+      });
+      await repo.save(workspace);
+
+      const res = await axios.patch(
+        withUrl(`/api/workspaces/${workspace.id}`),
+        {
+          name: 'New Name',
+          description: 'New description',
+          workingDirectory: '/new/dir',
+        },
+      );
+
+      expect(res.status).toBe(200);
+      expect(res.data.name).toBe('New Name');
+      expect(res.data.description).toBe('New description');
+      expect(res.data.workingDirectory).toBe('/new/dir');
     });
   });
 
@@ -158,6 +214,48 @@ describe('PATCH /api/workspaces/:id', () => {
         expect(error.response.status).toBe(400);
         expect(error.response.data.message).toContain(
           'name must be shorter than or equal to 255 characters',
+        );
+      }
+    });
+
+    it('should return 400 when description exceeds 1000 characters', async () => {
+      const repo = dataSource.getRepository(WorkspaceEntity);
+      const workspace = repo.create({
+        id: nanoid(),
+        name: 'Test',
+      });
+      await repo.save(workspace);
+
+      try {
+        await axios.patch(withUrl(`/api/workspaces/${workspace.id}`), {
+          description: 'a'.repeat(1001),
+        });
+        fail('Expected request to fail');
+      } catch (error: any) {
+        expect(error.response.status).toBe(400);
+        expect(error.response.data.message).toContain(
+          'description must be shorter than or equal to 1000 characters',
+        );
+      }
+    });
+
+    it('should return 400 when workingDirectory exceeds 255 characters', async () => {
+      const repo = dataSource.getRepository(WorkspaceEntity);
+      const workspace = repo.create({
+        id: nanoid(),
+        name: 'Test',
+      });
+      await repo.save(workspace);
+
+      try {
+        await axios.patch(withUrl(`/api/workspaces/${workspace.id}`), {
+          workingDirectory: 'a'.repeat(256),
+        });
+        fail('Expected request to fail');
+      } catch (error: any) {
+        expect(error.response.status).toBe(400);
+        expect(error.response.data.message).toContain(
+          'workingDirectory must be shorter than or equal to 255 characters',
         );
       }
     });

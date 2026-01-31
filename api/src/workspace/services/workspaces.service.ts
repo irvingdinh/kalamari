@@ -49,6 +49,8 @@ export class WorkspacesService {
     const workspace = this.workspaceRepository.create({
       id: nanoid(),
       name: dto.name,
+      description: dto.description ?? null,
+      workingDirectory: dto.workingDirectory ?? null,
     });
 
     return this.workspaceRepository.save(workspace);
@@ -59,6 +61,12 @@ export class WorkspacesService {
 
     if (dto.name !== undefined) {
       workspace.name = dto.name;
+    }
+    if (dto.description !== undefined) {
+      workspace.description = dto.description;
+    }
+    if (dto.workingDirectory !== undefined) {
+      workspace.workingDirectory = dto.workingDirectory;
     }
 
     return this.workspaceRepository.save(workspace);
