@@ -4,8 +4,8 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { In, Repository } from 'typeorm';
 
 import { ChatQueueEntity } from '../../core/entities/chat-queue.entity';
-import { ChatEvents } from '../../events/constants';
-import { ChatQueueCreatedEvent } from '../../events/dtos';
+import { ChatEvents } from '../../event/constants';
+import { ChatQueueCreatedEvent } from '../../event/dtos';
 
 @Injectable()
 export class BootstrapService implements OnApplicationBootstrap {

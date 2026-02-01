@@ -8,8 +8,8 @@ import { Repository } from 'typeorm';
 import { AppConfig } from '../../core/config/config';
 import { ChatMessageEntity } from '../../core/entities/chat-message.entity';
 import { ChatQueueEntity } from '../../core/entities/chat-queue.entity';
-import { ChatEvents } from '../../events/constants';
-import { ChatQueueCreatedEvent } from '../../events/dtos';
+import { ChatEvents } from '../../event/constants';
+import { ChatQueueCreatedEvent } from '../../event/dtos';
 
 @Injectable()
 export class ChatQueueProcessor {

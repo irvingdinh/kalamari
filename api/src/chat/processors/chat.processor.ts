@@ -4,8 +4,8 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 
 import { ChatEntity } from '../../core/entities/chat.entity';
-import { ChatEvents } from '../../events/constants';
-import { ChatMessageCreatedEvent } from '../../events/dtos';
+import { ChatEvents } from '../../event/constants';
+import { ChatMessageCreatedEvent } from '../../event/dtos';
 
 @Injectable()
 export class ChatProcessor {
