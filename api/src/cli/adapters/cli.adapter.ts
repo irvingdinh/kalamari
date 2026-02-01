@@ -23,11 +23,18 @@ export interface CliHealthStatus {
   version?: string;
 }
 
+export interface ExecuteOptions {
+  stdin: string;
+  cwd: string;
+  logFilePath?: string;
+}
+
 export abstract class CliAdapter {
   abstract readonly type: CliType;
 
   abstract ping(cwd?: string): Promise<ExecResult>;
   abstract version(cwd?: string): Promise<ExecResult>;
+  abstract execute(options: ExecuteOptions): Promise<ExecResult>;
 
   protected async exec(options: ExecOptions): Promise<ExecResult> {
     const { command, args, cwd, stdin, onStdout, onStderr } = options;

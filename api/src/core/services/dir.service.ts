@@ -46,9 +46,114 @@ export class DirService {
   ensureDatabase(): string {
     return join(this.ensureDataDir(), 'kalamari.db');
   }
-}
 
-// TODO: Considering these dirs for later implementation.
-// {tempdir}/kalamari/tasks__/{nanoid} — for actually working with the task
-// {tempdir}/kalamari/tasks-manifest/{nanoid} — for the task input, output, etc.
-// {tempdir}/kalamari/chats-manifest/{nanoid} — for the chat input, output, etc.
+  /**
+   * Ensures the chat context directory exists, creating it if necessary.
+   *
+   * @returns The absolute path to the context directory (e.g., `/tmp/kalamari/context/`)
+   */
+  ensureChatContextDir(): string {
+    const dirPath = join(tmpdir(), 'kalamari', 'context');
+    mkdirSync(dirPath, { recursive: true });
+    return dirPath;
+  }
+
+  /**
+   * Gets the path to a chat's context file.
+   *
+   * @param chatId - The chat ID
+   * @returns The absolute path to the context file (e.g., `/tmp/kalamari/context/chat_{chatId}.json`)
+   */
+  getChatContextPath(chatId: string): string {
+    return join(this.ensureChatContextDir(), `chat_${chatId}.json`);
+  }
+
+  /**
+   * Gets the path to a chat's messages file.
+   *
+   * @param chatId - The chat ID
+   * @returns The absolute path to the messages file (e.g., `/tmp/kalamari/context/chat_{chatId}_messages.jsonl`)
+   */
+  getChatMessagesPath(chatId: string): string {
+    return join(this.ensureChatContextDir(), `chat_${chatId}_messages.jsonl`);
+  }
+
+  /**
+   * Ensures the chat input directory exists, creating it if necessary.
+   *
+   * @returns The absolute path to the input directory (e.g., `/tmp/kalamari/input/`)
+   */
+  ensureChatInputDir(): string {
+    const dirPath = join(tmpdir(), 'kalamari', 'input');
+    mkdirSync(dirPath, { recursive: true });
+    return dirPath;
+  }
+
+  /**
+   * Gets the path to a chat's input file.
+   *
+   * @param chatId - The chat ID
+   * @returns The absolute path to the input file (e.g., `/tmp/kalamari/input/chat_{chatId}.md`)
+   */
+  getChatInputPath(chatId: string): string {
+    return join(this.ensureChatInputDir(), `chat_${chatId}.md`);
+  }
+
+  /**
+   * Ensures the chat output directory exists, creating it if necessary.
+   *
+   * @returns The absolute path to the output directory (e.g., `/tmp/kalamari/output/`)
+   */
+  ensureChatOutputDir(): string {
+    const dirPath = join(tmpdir(), 'kalamari', 'output');
+    mkdirSync(dirPath, { recursive: true });
+    return dirPath;
+  }
+
+  /**
+   * Gets the path to a queue's output file.
+   *
+   * @param queueId - The queue ID
+   * @returns The absolute path to the output file (e.g., `/tmp/kalamari/output/chat_queue_{queueId}_output.json`)
+   */
+  getChatOutputPath(queueId: string): string {
+    return join(
+      this.ensureChatOutputDir(),
+      `chat_queue_${queueId}_output.json`,
+    );
+  }
+
+  /**
+   * Ensures the chat working directory exists, creating it if necessary.
+   * Used as a fallback when workspace.workingDirectory is not set.
+   *
+   * @param chatId - The chat ID
+   * @returns The absolute path to the working directory (e.g., `/tmp/kalamari/chats/{chatId}/`)
+   */
+  ensureChatWorkDir(chatId: string): string {
+    const dirPath = join(tmpdir(), 'kalamari', 'chats', chatId);
+    mkdirSync(dirPath, { recursive: true });
+    return dirPath;
+  }
+
+  /**
+   * Ensures the chat logs directory exists, creating it if necessary.
+   *
+   * @returns The absolute path to the logs directory (e.g., `/tmp/kalamari/logs/`)
+   */
+  ensureChatLogsDir(): string {
+    const dirPath = join(tmpdir(), 'kalamari', 'logs');
+    mkdirSync(dirPath, { recursive: true });
+    return dirPath;
+  }
+
+  /**
+   * Gets the path to a queue's log file.
+   *
+   * @param queueId - The queue ID
+   * @returns The absolute path to the log file (e.g., `/tmp/kalamari/logs/chat_queue_{queueId}.log`)
+   */
+  getChatQueueLogPath(queueId: string): string {
+    return join(this.ensureChatLogsDir(), `chat_queue_${queueId}.log`);
+  }
+}

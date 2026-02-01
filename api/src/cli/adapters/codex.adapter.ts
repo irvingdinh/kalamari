@@ -33,4 +33,10 @@ export class CodexAdapter extends CliAdapter {
       stdout: result.stdout.replace('codex-cli', '').trim(),
     };
   }
+
+  execute(): Promise<ExecResult> {
+    return Promise.reject(
+      new Error('execute() is not implemented for this adapter'),
+    );
+  }
 }

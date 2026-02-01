@@ -28,4 +28,10 @@ export class OpencodeAdapter extends CliAdapter {
       cwd: cwd ?? this.dirService.ensureTempDir(),
     });
   }
+
+  execute(): Promise<ExecResult> {
+    return Promise.reject(
+      new Error('execute() is not implemented for this adapter'),
+    );
+  }
 }

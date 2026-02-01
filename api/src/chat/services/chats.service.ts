@@ -13,6 +13,8 @@ import { ChatQueueEntity } from '../../core/entities/chat-queue.entity';
 import { WorkspaceEntity } from '../../core/entities/workspace.entity';
 import { ChatWithProcessing, UpdateChatDto } from '../dtos';
 
+export type { ChatWithProcessing } from '../dtos';
+
 @Injectable()
 export class ChatsService {
   constructor(

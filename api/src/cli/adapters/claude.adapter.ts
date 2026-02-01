@@ -1,8 +1,9 @@
 import { Injectable } from '@nestjs/common';
+import { createWriteStream, WriteStream } from 'fs';
 
 import { DirService } from '../../core/services/dir.service';
 import { CliType } from '../types';
-import { CliAdapter, ExecResult } from './cli.adapter';
+import { CliAdapter, ExecResult, ExecuteOptions } from './cli.adapter';
 
 @Injectable()
 export class ClaudeAdapter extends CliAdapter {
@@ -39,5 +40,43 @@ export class ClaudeAdapter extends CliAdapter {
       ...result,
       stdout: result.stdout.replace('(Claude Code)', '').trim(),
     };
+  }
+
+  async execute(options: ExecuteOptions): Promise<ExecResult> {
+    const { stdin, cwd, logFilePath } = options;
+
+    let logStream: WriteStream | undefined;
+    if (logFilePath) {
+      logStream = createWriteStream(logFilePath, { flags: 'w' });
+    }
+
+    const onOutput = (chunk: string) => {
+      if (logStream) {
+        logStream.write(chunk);
+      }
+    };
+
+    try {
+      const result = await this.exec({
+        command: 'claude',
+        args: [
+          '--chrome',
+          '--dangerously-skip-permissions',
+          '--output-format',
+          'stream-json',
+          '--verbose',
+          '--print',
+        ],
+        cwd,
+        stdin,
+        onStdout: onOutput,
+        onStderr: onOutput,
+      });
+      return result;
+    } finally {
+      if (logStream) {
+        logStream.end();
+      }
+    }
   }
 }
