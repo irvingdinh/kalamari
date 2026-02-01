@@ -1,8 +1,9 @@
 import { Injectable } from '@nestjs/common';
+import { createWriteStream } from 'fs';
 
 import { DirService } from '../../core/services/dir.service';
 import { CliType } from '../types';
-import { CliAdapter, ExecResult } from './cli.adapter';
+import { CliAdapter, ExecResult, ExecuteOptions } from './cli.adapter';
 
 @Injectable()
 export class GeminiAdapter extends CliAdapter {
@@ -34,9 +35,28 @@ export class GeminiAdapter extends CliAdapter {
     });
   }
 
-  execute(): Promise<ExecResult> {
-    return Promise.reject(
-      new Error('execute() is not implemented for this adapter'),
-    );
+  async execute(options: ExecuteOptions): Promise<ExecResult> {
+    const { stdin, cwd, logFilePath } = options;
+
+    const logFileStream = logFilePath
+      ? createWriteStream(logFilePath, { flags: 'w' })
+      : undefined;
+
+    const onChunk = (chunk: string) => {
+      if (logFileStream) logFileStream.write(chunk);
+    };
+
+    try {
+      return await this.exec({
+        command: 'gemini',
+        args: ['--yolo', '--output-format', 'stream-json'],
+        cwd,
+        stdin,
+        onStdout: onChunk,
+        onStderr: onChunk,
+      });
+    } finally {
+      if (logFileStream) logFileStream.end();
+    }
   }
 }

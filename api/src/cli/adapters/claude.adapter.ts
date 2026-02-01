@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { createWriteStream, WriteStream } from 'fs';
+import { createWriteStream } from 'fs';
 
 import { DirService } from '../../core/services/dir.service';
 import { CliType } from '../types';
@@ -45,19 +45,16 @@ export class ClaudeAdapter extends CliAdapter {
   async execute(options: ExecuteOptions): Promise<ExecResult> {
     const { stdin, cwd, logFilePath } = options;
 
-    let logStream: WriteStream | undefined;
-    if (logFilePath) {
-      logStream = createWriteStream(logFilePath, { flags: 'w' });
-    }
+    const logFileStream = logFilePath
+      ? createWriteStream(logFilePath, { flags: 'w' })
+      : undefined;
 
-    const onOutput = (chunk: string) => {
-      if (logStream) {
-        logStream.write(chunk);
-      }
+    const onChunk = (chunk: string) => {
+      if (logFileStream) logFileStream.write(chunk);
     };
 
     try {
-      const result = await this.exec({
+      return await this.exec({
         command: 'claude',
         args: [
           '--chrome',
@@ -69,14 +66,11 @@ export class ClaudeAdapter extends CliAdapter {
         ],
         cwd,
         stdin,
-        onStdout: onOutput,
-        onStderr: onOutput,
+        onStdout: onChunk,
+        onStderr: onChunk,
       });
-      return result;
     } finally {
-      if (logStream) {
-        logStream.end();
-      }
+      if (logFileStream) logFileStream.end();
     }
   }
 }
