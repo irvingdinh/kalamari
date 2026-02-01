@@ -1,8 +1,11 @@
 import { Module } from '@nestjs/common';
 
+import { controllers } from './controllers';
+import { services } from './services';
 import { subscribers } from './subscribers';
 
 @Module({
-  providers: [...subscribers],
+  controllers: [...controllers],
+  providers: [...services, ...subscribers],
 })
 export class EventsModule {}

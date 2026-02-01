@@ -1,6 +1,6 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
-export class CliHealthStatusResponse {
+export class CliHealthStatusResponseDto {
   @ApiProperty({
     description: 'CLI adapter type',
     example: 'claude',
@@ -21,10 +21,10 @@ export class CliHealthStatusResponse {
   version?: string;
 }
 
-export class HealthResponse {
+export class HealthResponseDto {
   @ApiProperty({
     description: 'Health status of all CLI adapters',
-    type: [CliHealthStatusResponse],
+    type: [CliHealthStatusResponseDto],
   })
-  clis: CliHealthStatusResponse[];
+  clis: CliHealthStatusResponseDto[];
 }

@@ -11,7 +11,7 @@ import { PaginatedResponse } from '../../core/dtos';
 import { ChatEntity } from '../../core/entities/chat.entity';
 import { ChatMessageEntity } from '../../core/entities/chat-message.entity';
 import { ChatQueueEntity } from '../../core/entities/chat-queue.entity';
-import { CreateChatMessageDto } from '../dtos';
+import { CreateChatMessageRequestDto } from '../dtos';
 import { ChatsService } from './chats.service';
 
 @Injectable()
@@ -56,7 +56,7 @@ export class ChatMessagesService {
 
   async create(
     chatId: string,
-    dto: CreateChatMessageDto,
+    dto: CreateChatMessageRequestDto,
   ): Promise<ChatMessageEntity> {
     const chat = await this.chatRepository.findOne({ where: { id: chatId } });
     if (!chat) {

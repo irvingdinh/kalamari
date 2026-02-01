@@ -4,8 +4,8 @@ import type { Response } from 'express';
 
 import { CliHealthStatus } from '../../../cli/adapters';
 import { CliRegistryService } from '../../../cli/services/cli-registry.service';
-import { HealthResponse } from '../../../core/responses';
 import { DirService } from '../../../core/services/dir.service';
+import { HealthResponseDto } from '../../dtos';
 
 @ApiTags('health')
 @Controller('/api/health')
@@ -24,7 +24,7 @@ export class IndexController {
   @ApiResponse({
     status: 200,
     description: 'Health status of all CLI adapters',
-    type: HealthResponse,
+    type: HealthResponseDto,
   })
   async invoke(@Res() res: Response) {
     res.status(HttpStatus.OK).json({

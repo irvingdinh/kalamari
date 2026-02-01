@@ -2,8 +2,7 @@ import { Body, Controller, HttpCode, HttpStatus, Post } from '@nestjs/common';
 import { ApiBody, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 
 import { WorkspaceEntity } from '../../../core/entities/workspace.entity';
-import { WorkspaceResponse } from '../../../core/responses';
-import { CreateWorkspaceDto } from '../../dtos';
+import { CreateWorkspaceRequestDto, WorkspaceResponseDto } from '../../dtos';
 import { WorkspacesService } from '../../services/workspaces.service';
 
 @ApiTags('workspaces')
@@ -18,14 +17,16 @@ export class CreateController {
     description:
       'Creates a new workspace for organizing chats and AI interactions',
   })
-  @ApiBody({ type: CreateWorkspaceDto })
+  @ApiBody({ type: CreateWorkspaceRequestDto })
   @ApiResponse({
     status: 201,
     description: 'Workspace created successfully',
-    type: WorkspaceResponse,
+    type: WorkspaceResponseDto,
   })
   @ApiResponse({ status: 400, description: 'Invalid input data' })
-  async invoke(@Body() dto: CreateWorkspaceDto): Promise<WorkspaceEntity> {
+  async invoke(
+    @Body() dto: CreateWorkspaceRequestDto,
+  ): Promise<WorkspaceEntity> {
     return this.workspacesService.create(dto);
   }
 }

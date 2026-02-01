@@ -5,7 +5,7 @@ import { Repository } from 'typeorm';
 
 import { PaginatedResponse } from '../../core/dtos';
 import { WorkspaceEntity } from '../../core/entities/workspace.entity';
-import { CreateWorkspaceDto, UpdateWorkspaceDto } from '../dtos';
+import { CreateWorkspaceRequestDto, UpdateWorkspaceRequestDto } from '../dtos';
 
 @Injectable()
 export class WorkspacesService {
@@ -45,7 +45,7 @@ export class WorkspacesService {
     return workspace;
   }
 
-  async create(dto: CreateWorkspaceDto): Promise<WorkspaceEntity> {
+  async create(dto: CreateWorkspaceRequestDto): Promise<WorkspaceEntity> {
     const workspace = this.workspaceRepository.create({
       id: nanoid(),
       name: dto.name,
@@ -56,7 +56,10 @@ export class WorkspacesService {
     return this.workspaceRepository.save(workspace);
   }
 
-  async update(id: string, dto: UpdateWorkspaceDto): Promise<WorkspaceEntity> {
+  async update(
+    id: string,
+    dto: UpdateWorkspaceRequestDto,
+  ): Promise<WorkspaceEntity> {
     const workspace = await this.findOne(id);
 
     if (dto.name !== undefined) {

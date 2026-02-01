@@ -8,8 +8,7 @@ import {
 } from '@nestjs/swagger';
 
 import { WorkspaceEntity } from '../../../core/entities/workspace.entity';
-import { WorkspaceResponse } from '../../../core/responses';
-import { UpdateWorkspaceDto } from '../../dtos';
+import { UpdateWorkspaceRequestDto, WorkspaceResponseDto } from '../../dtos';
 import { WorkspacesService } from '../../services/workspaces.service';
 
 @ApiTags('workspaces')
@@ -24,16 +23,16 @@ export class UpdateController {
       'Updates an existing workspace. Only provided fields will be updated.',
   })
   @ApiParam({ name: 'id', description: 'Workspace ID', example: 'abc123xyz' })
-  @ApiBody({ type: UpdateWorkspaceDto })
+  @ApiBody({ type: UpdateWorkspaceRequestDto })
   @ApiResponse({
     status: 200,
     description: 'Workspace updated successfully',
-    type: WorkspaceResponse,
+    type: WorkspaceResponseDto,
   })
   @ApiResponse({ status: 404, description: 'Workspace not found' })
   async invoke(
     @Param('id') id: string,
-    @Body() dto: UpdateWorkspaceDto,
+    @Body() dto: UpdateWorkspaceRequestDto,
   ): Promise<WorkspaceEntity> {
     return this.workspacesService.update(id, dto);
   }

@@ -1,6 +1,6 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
-export class ChatMessageResponse {
+export class ChatMessageResponseDto {
   @ApiProperty({
     description: 'Unique message identifier',
     example: 'msg_abc123',

@@ -1,9 +1,12 @@
 import { Controller, Get, Param, Query } from '@nestjs/common';
 import { ApiOperation, ApiParam, ApiResponse, ApiTags } from '@nestjs/swagger';
 
-import { PaginatedResponse, PaginationQueryDto } from '../../../core/dtos';
+import {
+  PaginatedResponse,
+  PaginationQueryRequestDto,
+} from '../../../core/dtos';
 import { ChatMessageEntity } from '../../../core/entities/chat-message.entity';
-import { PaginatedChatMessageResponse } from '../../../core/responses';
+import { PaginatedChatMessageResponseDto } from '../../dtos';
 import { ChatMessagesService } from '../../services/chat-messages.service';
 
 @ApiTags('messages')
@@ -20,12 +23,12 @@ export class IndexController {
   @ApiResponse({
     status: 200,
     description: 'Paginated list of messages',
-    type: PaginatedChatMessageResponse,
+    type: PaginatedChatMessageResponseDto,
   })
   @ApiResponse({ status: 404, description: 'Chat not found' })
   async invoke(
     @Param('chatId') chatId: string,
-    @Query() query: PaginationQueryDto,
+    @Query() query: PaginationQueryRequestDto,
   ): Promise<PaginatedResponse<ChatMessageEntity>> {
     return this.chatMessagesService.findAllByChat(
       chatId,

@@ -15,8 +15,10 @@ import {
 } from '@nestjs/swagger';
 
 import { ChatMessageEntity } from '../../../core/entities/chat-message.entity';
-import { ChatMessageResponse } from '../../../core/responses';
-import { CreateChatMessageDto } from '../../dtos';
+import {
+  ChatMessageResponseDto,
+  CreateChatMessageRequestDto,
+} from '../../dtos';
 import { ChatMessagesService } from '../../services/chat-messages.service';
 
 @ApiTags('messages')
@@ -32,16 +34,16 @@ export class CreateController {
       'Sends a new message in the chat. This triggers AI processing which will respond asynchronously.',
   })
   @ApiParam({ name: 'chatId', description: 'Chat ID', example: 'chat_xyz789' })
-  @ApiBody({ type: CreateChatMessageDto })
+  @ApiBody({ type: CreateChatMessageRequestDto })
   @ApiResponse({
     status: 201,
     description: 'Message created and AI processing started',
-    type: ChatMessageResponse,
+    type: ChatMessageResponseDto,
   })
   @ApiResponse({ status: 404, description: 'Chat not found' })
   async invoke(
     @Param('chatId') chatId: string,
-    @Body() dto: CreateChatMessageDto,
+    @Body() dto: CreateChatMessageRequestDto,
   ): Promise<ChatMessageEntity> {
     return this.chatMessagesService.create(chatId, dto);
   }

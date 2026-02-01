@@ -1,8 +1,11 @@
 import { Controller, Get, Param, Query } from '@nestjs/common';
 import { ApiOperation, ApiParam, ApiResponse, ApiTags } from '@nestjs/swagger';
 
-import { PaginatedResponse, PaginationQueryDto } from '../../../core/dtos';
-import { PaginatedChatResponse } from '../../../core/responses';
+import {
+  PaginatedResponse,
+  PaginationQueryRequestDto,
+} from '../../../core/dtos';
+import { PaginatedChatResponseDto } from '../../dtos';
 import { ChatsService, ChatWithProcessing } from '../../services/chats.service';
 
 @ApiTags('chats')
@@ -24,12 +27,12 @@ export class IndexController {
   @ApiResponse({
     status: 200,
     description: 'Paginated list of chats',
-    type: PaginatedChatResponse,
+    type: PaginatedChatResponseDto,
   })
   @ApiResponse({ status: 404, description: 'Workspace not found' })
   async invoke(
     @Param('workspaceId') workspaceId: string,
-    @Query() query: PaginationQueryDto,
+    @Query() query: PaginationQueryRequestDto,
   ): Promise<PaginatedResponse<ChatWithProcessing>> {
     return this.chatsService.findAllByWorkspace(
       workspaceId,

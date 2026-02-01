@@ -1,7 +1,7 @@
 import { Controller, Get, Param } from '@nestjs/common';
 import { ApiOperation, ApiParam, ApiResponse, ApiTags } from '@nestjs/swagger';
 
-import { ChatWithProcessingResponse } from '../../../core/responses';
+import { ChatWithProcessingResponseDto } from '../../dtos';
 import { ChatsService, ChatWithProcessing } from '../../services/chats.service';
 
 @ApiTags('chats')
@@ -19,7 +19,7 @@ export class ShowController {
   @ApiResponse({
     status: 200,
     description: 'Chat found',
-    type: ChatWithProcessingResponse,
+    type: ChatWithProcessingResponseDto,
   })
   @ApiResponse({ status: 404, description: 'Chat not found' })
   async invoke(@Param('id') id: string): Promise<ChatWithProcessing> {

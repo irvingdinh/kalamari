@@ -7,8 +7,10 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 
-import { ChatWithProcessingResponse } from '../../../core/responses';
-import { UpdateChatDto } from '../../dtos';
+import {
+  ChatWithProcessingResponseDto,
+  UpdateChatRequestDto,
+} from '../../dtos';
 import { ChatsService, ChatWithProcessing } from '../../services/chats.service';
 
 @ApiTags('chats')
@@ -22,16 +24,16 @@ export class UpdateController {
     description: 'Updates chat properties such as the name',
   })
   @ApiParam({ name: 'id', description: 'Chat ID', example: 'chat_xyz789' })
-  @ApiBody({ type: UpdateChatDto })
+  @ApiBody({ type: UpdateChatRequestDto })
   @ApiResponse({
     status: 200,
     description: 'Chat updated successfully',
-    type: ChatWithProcessingResponse,
+    type: ChatWithProcessingResponseDto,
   })
   @ApiResponse({ status: 404, description: 'Chat not found' })
   async invoke(
     @Param('id') id: string,
-    @Body() dto: UpdateChatDto,
+    @Body() dto: UpdateChatRequestDto,
   ): Promise<ChatWithProcessing> {
     return this.chatsService.update(id, dto);
   }

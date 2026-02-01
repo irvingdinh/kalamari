@@ -2,7 +2,7 @@ import { Controller, Get, Param } from '@nestjs/common';
 import { ApiOperation, ApiParam, ApiResponse, ApiTags } from '@nestjs/swagger';
 
 import { WorkspaceEntity } from '../../../core/entities/workspace.entity';
-import { WorkspaceResponse } from '../../../core/responses';
+import { WorkspaceResponseDto } from '../../dtos';
 import { WorkspacesService } from '../../services/workspaces.service';
 
 @ApiTags('workspaces')
@@ -19,7 +19,7 @@ export class ShowController {
   @ApiResponse({
     status: 200,
     description: 'Workspace found',
-    type: WorkspaceResponse,
+    type: WorkspaceResponseDto,
   })
   @ApiResponse({ status: 404, description: 'Workspace not found' })
   async invoke(@Param('id') id: string): Promise<WorkspaceEntity> {

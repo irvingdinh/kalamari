@@ -11,7 +11,7 @@ import { PaginatedResponse } from '../../core/dtos';
 import { ChatEntity } from '../../core/entities/chat.entity';
 import { ChatQueueEntity } from '../../core/entities/chat-queue.entity';
 import { WorkspaceEntity } from '../../core/entities/workspace.entity';
-import { ChatWithProcessing, UpdateChatDto } from '../dtos';
+import { ChatWithProcessing, UpdateChatRequestDto } from '../dtos';
 
 export type { ChatWithProcessing } from '../dtos';
 
@@ -93,7 +93,10 @@ export class ChatsService {
     return { ...savedChat, isProcessing: false };
   }
 
-  async update(id: string, dto: UpdateChatDto): Promise<ChatWithProcessing> {
+  async update(
+    id: string,
+    dto: UpdateChatRequestDto,
+  ): Promise<ChatWithProcessing> {
     const chat = await this.chatRepository.findOne({ where: { id } });
 
     if (!chat) {

@@ -1,7 +1,7 @@
 import { Controller, HttpCode, HttpStatus, Param, Post } from '@nestjs/common';
 import { ApiOperation, ApiParam, ApiResponse, ApiTags } from '@nestjs/swagger';
 
-import { ChatWithProcessingResponse } from '../../../core/responses';
+import { ChatWithProcessingResponseDto } from '../../dtos';
 import { ChatsService, ChatWithProcessing } from '../../services/chats.service';
 
 @ApiTags('chats')
@@ -23,7 +23,7 @@ export class CreateController {
   @ApiResponse({
     status: 201,
     description: 'Chat created successfully',
-    type: ChatWithProcessingResponse,
+    type: ChatWithProcessingResponseDto,
   })
   @ApiResponse({ status: 404, description: 'Workspace not found' })
   async invoke(

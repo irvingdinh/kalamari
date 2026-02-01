@@ -1,7 +1,7 @@
 import { Controller, HttpCode, HttpStatus, Param, Post } from '@nestjs/common';
 import { ApiOperation, ApiParam, ApiResponse, ApiTags } from '@nestjs/swagger';
 
-import { ChatWithProcessingResponse } from '../../../core/responses';
+import { ChatWithProcessingResponseDto } from '../../dtos';
 import { ChatsService, ChatWithProcessing } from '../../services/chats.service';
 
 @ApiTags('chats')
@@ -20,7 +20,7 @@ export class CancelController {
   @ApiResponse({
     status: 200,
     description: 'Processing cancelled',
-    type: ChatWithProcessingResponse,
+    type: ChatWithProcessingResponseDto,
   })
   @ApiResponse({ status: 400, description: 'Chat is not being processed' })
   @ApiResponse({ status: 404, description: 'Chat not found' })

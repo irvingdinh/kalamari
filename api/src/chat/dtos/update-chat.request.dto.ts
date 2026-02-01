@@ -1,7 +1,7 @@
 import { ApiPropertyOptional } from '@nestjs/swagger';
 import { IsOptional, IsString, MaxLength } from 'class-validator';
 
-export class UpdateChatDto {
+export class UpdateChatRequestDto {
   @ApiPropertyOptional({
     description: 'New name for the chat',
     maxLength: 255,

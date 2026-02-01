@@ -1,7 +1,7 @@
 import { ApiPropertyOptional } from '@nestjs/swagger';
 import { IsOptional, IsString, MaxLength } from 'class-validator';
 
-export class UpdateWorkspaceDto {
+export class UpdateWorkspaceRequestDto {
   @ApiPropertyOptional({
     description: 'New name for the workspace',
     maxLength: 255,

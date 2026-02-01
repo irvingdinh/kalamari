@@ -23,6 +23,7 @@ async function bootstrap() {
     .addTag('chats', 'Chat session operations')
     .addTag('messages', 'Chat message operations')
     .addTag('health', 'Health check endpoint')
+    .addTag('sse', 'Server-sent events for real-time updates')
     .build();
 
   const document = SwaggerModule.createDocument(app, swaggerConfig);

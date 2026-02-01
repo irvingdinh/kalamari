@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 
-export class ChatResponse {
+export class ChatResponseDto {
   @ApiProperty({
     description: 'Unique chat identifier',
     example: 'chat_abc123',
@@ -35,7 +35,7 @@ export class ChatResponse {
   updatedAt: Date;
 }
 
-export class ChatWithProcessingResponse extends ChatResponse {
+export class ChatWithProcessingResponseDto extends ChatResponseDto {
   @ApiProperty({
     description: 'Whether the chat is currently being processed by an AI agent',
     example: false,

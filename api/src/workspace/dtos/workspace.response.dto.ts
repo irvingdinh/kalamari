@@ -1,6 +1,6 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
-export class WorkspaceResponse {
+export class WorkspaceResponseDto {
   @ApiProperty({
     description: 'Unique workspace identifier',
     example: 'abc123xyz',
