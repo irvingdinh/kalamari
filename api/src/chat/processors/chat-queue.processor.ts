@@ -162,6 +162,10 @@ export class ChatQueueProcessor {
         )
         .replace('$ABS_PATH_TO_CHAT_OUTPUT_FILE', outputFilePath);
 
+      // Step 5.5: Write instruction to file
+      const inputFilePath = this.dirService.getChatInputPath(chat.id);
+      writeFileSync(inputFilePath, instruction);
+
       // Step 6: Determine working directory
       const cwd =
         workspace.workingDirectory ??
@@ -183,7 +187,7 @@ export class ChatQueueProcessor {
       );
 
       const result = await adapter.execute({
-        stdin: instruction,
+        stdin: `Please read ${inputFilePath} then follow the instruction.`,
         cwd,
         logFilePath,
       });
