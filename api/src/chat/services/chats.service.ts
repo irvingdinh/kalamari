@@ -26,22 +26,15 @@ export class ChatsService {
     private readonly workspaceRepository: Repository<WorkspaceEntity>,
   ) {}
 
-  async findAllByWorkspace(
-    workspaceId: string,
+  async findAll(
     page: number = 1,
     limit: number = 10,
+    workspaceId?: string,
   ): Promise<PaginatedResponse<ChatWithProcessing>> {
-    const workspace = await this.workspaceRepository.findOne({
-      where: { id: workspaceId },
-    });
-    if (!workspace) {
-      throw new NotFoundException(
-        `Workspace with ID "${workspaceId}" not found`,
-      );
-    }
+    const whereClause = workspaceId ? { workspaceId } : {};
 
     const [data, total] = await this.chatRepository.findAndCount({
-      where: { workspaceId },
+      where: whereClause,
       skip: (page - 1) * limit,
       take: limit,
       order: { updatedAt: 'DESC' },

@@ -104,7 +104,7 @@ Located in `src/core/entities/`:
 - `DELETE /api/workspaces/:id` - Delete workspace
 
 ### Chats
-- `GET /api/chats` - List chats (paginated)
+- `GET /api/chats?workspace_id=<id>` - List chats (paginated, workspace_id optional)
 - `POST /api/chats` - Create chat
 - `GET /api/chats/:id` - Get chat
 - `PUT /api/chats/:id` - Update chat
