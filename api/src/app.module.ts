@@ -6,7 +6,6 @@ import { CliModule } from './cli/cli.module';
 import { CoreModule } from './core/core.module';
 import { EventsModule } from './event/event.module';
 import { HealthModule } from './health/health.module';
-import { TaskModule } from './task/task.module';
 import { WorkspaceModule } from './workspace/workspace.module';
 
 @Module({
@@ -17,7 +16,6 @@ import { WorkspaceModule } from './workspace/workspace.module';
     CoreModule,
     EventsModule,
     HealthModule,
-    TaskModule,
     WorkspaceModule,
   ],
   controllers: [],
