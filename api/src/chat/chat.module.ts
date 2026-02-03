@@ -3,6 +3,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 
 import { CliModule } from '../cli/cli.module';
 import { CoreModule } from '../core/core.module';
+import { AgentEntity } from '../core/entities/agent.entity';
 import { ChatEntity } from '../core/entities/chat.entity';
 import { ChatMessageEntity } from '../core/entities/chat-message.entity';
 import { ChatQueueEntity } from '../core/entities/chat-queue.entity';
@@ -19,6 +20,7 @@ import { services } from './services';
     CliModule,
     TemplateModule,
     TypeOrmModule.forFeature([
+      AgentEntity,
       ChatEntity,
       ChatMessageEntity,
       ChatQueueEntity,

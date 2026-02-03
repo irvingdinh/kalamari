@@ -92,7 +92,7 @@ Located in `src/core/entities/`:
 | Entity              | Table          | Purpose                                                                  |
 | ------------------- | -------------- | ------------------------------------------------------------------------ |
 | WorkspaceEntity     | workspaces     | Container for projects (name, description, workingDirectory)             |
-| ChatEntity          | chats          | Chat sessions linked to workspaces                                       |
+| ChatEntity          | chats          | Chat sessions linked to workspaces (optional agentId, cliType override)  |
 | ChatMessageEntity   | chat_messages  | Messages with actor info (actorType, actorId, text)                      |
 | ChatQueueEntity     | chat_queues    | Processing queue (status: pending/in_progress/completed/failed/cancelled)|
 | AgentEntity         | agents         | AI agents with custom instructions (name, cliType, instruction, sortOrder) |
@@ -101,6 +101,7 @@ Located in `src/core/entities/`:
 
 - Workspace → has many → Chats (cascade delete)
 - Workspace → has many → Agents (cascade delete)
+- Chat → optional → Agent (SET NULL on delete)
 - Chat → has many → Messages (cascade delete)
 - Chat → has many → Queues (cascade delete)
 
@@ -115,9 +116,9 @@ Located in `src/core/entities/`:
 
 ### Chats
 - `GET /api/chats?workspace_id=<id>` - List chats (paginated, workspace_id optional)
-- `POST /api/workspaces/:workspaceId/chats` - Create chat
+- `POST /api/workspaces/:workspaceId/chats` - Create chat (optional body: name, agentId, cliType)
 - `GET /api/chats/:id` - Get chat
-- `PATCH /api/chats/:id` - Update chat
+- `PATCH /api/chats/:id` - Update chat (name, agentId, cliType)
 - `DELETE /api/chats/:id` - Delete chat
 - `POST /api/chats/:id/cancel` - Cancel processing
 

@@ -3,6 +3,14 @@ export const chatInstructionTemplate = `
 
 You are being orchestrated by **Kalamari**, a tool that acts as a bridge between you (an AI agent) and the user. Kalamari handles the conversation management, context persistence, and action processing.
 
+{{#if agentInstruction}}
+---
+
+## Your Instructions
+
+{{{agentInstruction}}}
+
+{{/if}}
 ---
 
 ## Context Files

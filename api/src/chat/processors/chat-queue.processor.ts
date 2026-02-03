@@ -9,6 +9,7 @@ import { Repository } from 'typeorm';
 import { CliRegistryService } from '../../cli/services/cli-registry.service';
 import { CliType } from '../../cli/types';
 import { AppConfig } from '../../core/config/config';
+import { AgentEntity } from '../../core/entities/agent.entity';
 import { ChatEntity } from '../../core/entities/chat.entity';
 import { ChatMessageEntity } from '../../core/entities/chat-message.entity';
 import { ChatQueueEntity } from '../../core/entities/chat-queue.entity';
@@ -36,6 +37,8 @@ export class ChatQueueProcessor {
     private readonly chatRepository: Repository<ChatEntity>,
     @InjectRepository(WorkspaceEntity)
     private readonly workspaceRepository: Repository<WorkspaceEntity>,
+    @InjectRepository(AgentEntity)
+    private readonly agentRepository: Repository<AgentEntity>,
     private readonly configService: ConfigService,
     private readonly dirService: DirService,
     private readonly cliRegistryService: CliRegistryService,
@@ -96,6 +99,13 @@ export class ChatQueueProcessor {
       if (!workspace) {
         throw new Error(`Workspace ${chat.workspaceId} not found`);
       }
+
+      // Fetch agent if associated
+      const agent = chat.agentId
+        ? await this.agentRepository.findOne({
+            where: { id: chat.agentId },
+          })
+        : null;
 
       // Fetch all messages for the chat
       const messages = await this.messageRepository.find({
@@ -160,11 +170,8 @@ export class ChatQueueProcessor {
           2,
         ),
         outputFilePath,
+        agentInstruction: agent?.instruction ?? null,
       });
-
-      // Step 5.5: Write instruction to file
-      const inputFilePath = this.dirService.getChatInputPath(chat.id);
-      writeFileSync(inputFilePath, instruction);
 
       // Step 6: Determine working directory
       const cwd =
@@ -172,8 +179,7 @@ export class ChatQueueProcessor {
         this.dirService.ensureChatWorkDir(chat.id);
 
       // Step 7: Execute CLI
-      // TODO: Make CLI type configurable per workspace or chat
-      const cliType = CliType.Claude;
+      const cliType = this.resolveCliType(chat, agent);
       const adapter = this.cliRegistryService.getByType(cliType);
 
       if (!adapter) {
@@ -187,14 +193,14 @@ export class ChatQueueProcessor {
       );
 
       const result = await adapter.execute({
-        stdin: `Please read ${inputFilePath} then follow the instruction.`,
+        stdin: instruction,
         cwd,
         logFilePath,
       });
 
       if (result.exitCode !== 0) {
         this.logger.warn(
-          `Claude CLI exited with code ${result.exitCode}: ${result.stderr}`,
+          `${cliType} exited with code ${result.exitCode}: ${result.stderr}`,
         );
       }
 
@@ -260,5 +266,15 @@ export class ChatQueueProcessor {
         await this.messageRepository.save(systemMessage);
       }
     }
+  }
+
+  private resolveCliType(chat: ChatEntity, agent: AgentEntity | null): CliType {
+    if (chat.cliType) {
+      return chat.cliType as CliType;
+    }
+    if (agent?.cliType) {
+      return agent.cliType as CliType;
+    }
+    return CliType.Claude;
   }
 }

@@ -3,9 +3,9 @@ import { IsEnum, IsOptional, IsString, MaxLength } from 'class-validator';
 
 import { CliType } from '../../cli/types';
 
-export class UpdateChatRequestDto {
+export class CreateChatRequestDto {
   @ApiPropertyOptional({
-    description: 'New name for the chat',
+    description: 'Display name for the chat',
     maxLength: 255,
     example: 'API Design Discussion',
   })
@@ -15,21 +15,19 @@ export class UpdateChatRequestDto {
   name?: string;
 
   @ApiPropertyOptional({
-    description: 'ID of the agent to use for this chat, or null to remove',
+    description: 'ID of the agent to use for this chat',
     example: 'agent_abc123',
-    nullable: true,
   })
   @IsOptional()
   @IsString()
-  agentId?: string | null;
+  agentId?: string;
 
   @ApiPropertyOptional({
-    description: 'CLI type override for this chat, or null to remove',
+    description: 'CLI type override for this chat',
     enum: CliType,
     example: 'claude',
-    nullable: true,
   })
   @IsOptional()
   @IsEnum(CliType)
-  cliType?: CliType | null;
+  cliType?: CliType;
 }

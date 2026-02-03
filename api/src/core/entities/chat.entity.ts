@@ -9,6 +9,7 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 
+import { AgentEntity } from './agent.entity';
 import { ChatMessageEntity } from './chat-message.entity';
 import { ChatQueueEntity } from './chat-queue.entity';
 import { WorkspaceEntity } from './workspace.entity';
@@ -25,8 +26,18 @@ export class ChatEntity {
   @JoinColumn({ name: 'workspace_id' })
   workspace: WorkspaceEntity;
 
+  @Column({ name: 'agent_id', type: 'text', nullable: true })
+  agentId: string | null;
+
+  @ManyToOne(() => AgentEntity, { onDelete: 'SET NULL', nullable: true })
+  @JoinColumn({ name: 'agent_id' })
+  agent: AgentEntity | null;
+
   @Column({ default: 'Untitled chat' })
   name: string;
+
+  @Column({ name: 'cli_type', type: 'text', nullable: true })
+  cliType: string | null;
 
   @OneToMany(() => ChatMessageEntity, (m) => m.chat, { cascade: true })
   messages: ChatMessageEntity[];

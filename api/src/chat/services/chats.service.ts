@@ -8,10 +8,15 @@ import { nanoid } from 'nanoid';
 import { In, Repository } from 'typeorm';
 
 import { PaginatedResponse } from '../../core/dtos';
+import { AgentEntity } from '../../core/entities/agent.entity';
 import { ChatEntity } from '../../core/entities/chat.entity';
 import { ChatQueueEntity } from '../../core/entities/chat-queue.entity';
 import { WorkspaceEntity } from '../../core/entities/workspace.entity';
-import { ChatWithProcessing, UpdateChatRequestDto } from '../dtos';
+import {
+  ChatWithProcessing,
+  CreateChatRequestDto,
+  UpdateChatRequestDto,
+} from '../dtos';
 
 export type { ChatWithProcessing } from '../dtos';
 
@@ -24,6 +29,8 @@ export class ChatsService {
     private readonly chatQueueRepository: Repository<ChatQueueEntity>,
     @InjectRepository(WorkspaceEntity)
     private readonly workspaceRepository: Repository<WorkspaceEntity>,
+    @InjectRepository(AgentEntity)
+    private readonly agentRepository: Repository<AgentEntity>,
   ) {}
 
   async findAll(
@@ -65,7 +72,10 @@ export class ChatsService {
     return { ...chat, isProcessing };
   }
 
-  async create(workspaceId: string): Promise<ChatWithProcessing> {
+  async create(
+    workspaceId: string,
+    dto?: CreateChatRequestDto,
+  ): Promise<ChatWithProcessing> {
     const workspace = await this.workspaceRepository.findOne({
       where: { id: workspaceId },
     });
@@ -75,10 +85,16 @@ export class ChatsService {
       );
     }
 
+    if (dto?.agentId) {
+      await this.validateAgent(dto.agentId, workspaceId);
+    }
+
     const chat = this.chatRepository.create({
       id: nanoid(),
       workspaceId,
-      name: 'Untitled chat',
+      name: dto?.name ?? 'Untitled chat',
+      agentId: dto?.agentId ?? null,
+      cliType: dto?.cliType ?? null,
     });
 
     const savedChat = await this.chatRepository.save(chat);
@@ -98,6 +114,17 @@ export class ChatsService {
 
     if (dto.name !== undefined) {
       chat.name = dto.name;
+    }
+
+    if (dto.agentId !== undefined) {
+      if (dto.agentId !== null) {
+        await this.validateAgent(dto.agentId, chat.workspaceId);
+      }
+      chat.agentId = dto.agentId;
+    }
+
+    if (dto.cliType !== undefined) {
+      chat.cliType = dto.cliType;
     }
 
     const savedChat = await this.chatRepository.save(chat);
@@ -144,6 +171,25 @@ export class ChatsService {
     });
 
     return count > 0;
+  }
+
+  private async validateAgent(
+    agentId: string,
+    workspaceId: string,
+  ): Promise<void> {
+    const agent = await this.agentRepository.findOne({
+      where: { id: agentId },
+    });
+
+    if (!agent) {
+      throw new NotFoundException(`Agent with ID "${agentId}" not found`);
+    }
+
+    if (agent.workspaceId !== workspaceId) {
+      throw new BadRequestException(
+        'Agent does not belong to the same workspace as the chat',
+      );
+    }
   }
 
   private async addProcessingStatus(

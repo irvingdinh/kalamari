@@ -1,4 +1,4 @@
-import { ApiProperty } from '@nestjs/swagger';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
 export class ChatResponseDto {
   @ApiProperty({
@@ -13,12 +13,26 @@ export class ChatResponseDto {
   })
   workspaceId: string;
 
+  @ApiPropertyOptional({
+    description: 'ID of the agent associated with this chat',
+    example: 'agent_abc123',
+    nullable: true,
+  })
+  agentId: string | null;
+
   @ApiProperty({
     description: 'Display name of the chat',
     example: 'Untitled chat',
     default: 'Untitled chat',
   })
   name: string;
+
+  @ApiPropertyOptional({
+    description: 'CLI type override for this chat',
+    example: 'claude',
+    nullable: true,
+  })
+  cliType: string | null;
 
   @ApiProperty({
     description: 'Creation timestamp',
