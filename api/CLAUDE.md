@@ -40,6 +40,12 @@ src/
 │   ├── controllers/     # Agent endpoints
 │   ├── services/        # Business logic
 │   └── dtos/            # Request/response DTOs
+├── task/                # Task management
+│   ├── controllers/     # Task & comment endpoints
+│   ├── services/        # Business logic (TasksService, TaskCommentsService, TaskQueuesService)
+│   ├── processors/      # Event-driven queue processing
+│   ├── types.ts         # Enums (TaskStatus, TaskQueueStatus)
+│   └── dtos/            # Request/response DTOs
 ├── cli/                 # AI CLI adapters
 │   ├── adapters/        # Claude, Gemini, Codex
 │   └── services/        # CLI registry
@@ -73,6 +79,15 @@ Foundation layer with shared entities, configuration, and services.
 - **Fields**: id, workspaceId, name, description, instruction, cliType, sortOrder
 - **Supported CLI Types**: claude, gemini, codex
 
+### Task Module (`src/task`)
+
+- **Endpoints**: CRUD for tasks, listing and creating comments
+- **Processing**: Event-driven queue processor for task handling
+- **Queue Creation**: Centralized in `TaskQueuesService` with atomic `INSERT ... WHERE NOT EXISTS` deduplication (skips if pending/in_progress queue exists). Triggered by comment creation and task content (summary/description) changes. Status-only changes do not create queues.
+- **Fields**: id, workspaceId, summary, description, status, lastActivityAt, createdAt, updatedAt
+- **Task Statuses**: todo, in_progress, done (`TaskStatus` enum)
+- **Task Queue Statuses**: pending, in_progress, completed, failed, cancelled (`TaskQueueStatus` enum)
+
 ### CLI Module (`src/cli`)
 
 Adapter pattern for multiple AI providers:
@@ -85,7 +100,7 @@ Adapter pattern for multiple AI providers:
 
 - TypeORM subscribers emit events on entity changes
 - Processors listen via `@OnEvent()` decorator
-- Constants: `ChatEvents.MESSAGE_CREATED`, `ChatEvents.QUEUE_CREATED`
+- Constants: `ChatEvents.MESSAGE_CREATED`, `ChatEvents.QUEUE_CREATED`, `TaskEvents.COMMENT_CREATED`, `TaskEvents.QUEUE_CREATED`
 
 ### Health Module (`src/health`)
 
@@ -104,14 +119,20 @@ Located in `src/core/entities/`:
 | ChatMessageEntity | chat_messages | Messages with actor info (actorType, actorId, text)                        |
 | ChatQueueEntity   | chat_queues   | Processing queue (status: pending/in_progress/completed/failed/cancelled)  |
 | AgentEntity       | agents        | AI agents with custom instructions (name, cliType, instruction, sortOrder) |
+| TaskEntity        | tasks         | Tasks linked to workspaces (summary, description, status, lastActivityAt)  |
+| TaskCommentEntity | task_comments | Task comments with actor info (actorType, actorId, text)                   |
+| TaskQueueEntity   | task_queues   | Task processing queue (status: pending/in_progress/completed/failed/cancelled, priority) |
 
 ### Relationships
 
 - Workspace → has many → Chats (cascade delete)
 - Workspace → has many → Agents (cascade delete)
+- Workspace → has many → Tasks (cascade delete)
 - Chat → optional → Agent (SET NULL on delete)
 - Chat → has many → Messages (cascade delete)
 - Chat → has many → Queues (cascade delete)
+- Task → has many → Comments (cascade delete)
+- Task → has many → Queues (cascade delete)
 
 ## API Endpoints
 
@@ -120,7 +141,7 @@ Located in `src/core/entities/`:
 - `GET /api/workspaces` - List workspaces (paginated)
 - `POST /api/workspaces` - Create workspace
 - `GET /api/workspaces/:id` - Get workspace
-- `PUT /api/workspaces/:id` - Update workspace
+- `PATCH /api/workspaces/:id` - Update workspace
 - `DELETE /api/workspaces/:id` - Delete workspace
 
 ### Chats
@@ -145,6 +166,19 @@ Located in `src/core/entities/`:
 - `DELETE /api/agents/:id` - Delete agent
 - `POST /api/workspaces/:workspaceId/agents` - Create agent in workspace
 - `PUT /api/workspaces/:workspaceId/agents/reorder` - Reorder workspace agents
+
+### Tasks
+
+- `GET /api/tasks?workspace_id=&status=` - List tasks (paginated, filters optional)
+- `POST /api/workspaces/:workspaceId/tasks` - Create task
+- `GET /api/tasks/:id` - Get task
+- `PATCH /api/tasks/:id` - Update task (summary, description, status; content changes create pending queue entry)
+- `DELETE /api/tasks/:id` - Delete task
+
+### Task Comments
+
+- `GET /api/tasks/:taskId/comments` - List task comments
+- `POST /api/tasks/:taskId/comments` - Create task comment (also creates pending queue entry)
 
 ## Configuration
 
