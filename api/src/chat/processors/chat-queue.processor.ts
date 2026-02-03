@@ -27,6 +27,7 @@ import { ChatContextFile, ChatMessageLine } from '../types';
 export class ChatQueueProcessor {
   private readonly logger = new Logger(ChatQueueProcessor.name);
   private readonly isDisabled: boolean;
+  private readonly defaultCliType: CliType;
 
   constructor(
     @InjectRepository(ChatQueueEntity)
@@ -45,8 +46,9 @@ export class ChatQueueProcessor {
     private readonly agentActionsService: AgentActionsService,
     private readonly templateService: TemplateService,
   ) {
-    this.isDisabled =
-      this.configService.get<AppConfig>('root')?.processor.disabled ?? false;
+    const config = this.configService.get<AppConfig>('root')!;
+    this.isDisabled = config.processor.disabled ?? false;
+    this.defaultCliType = config.processor.defaultCli ?? CliType.Claude;
   }
 
   @OnEvent(ChatEvents.QUEUE_CREATED)
@@ -275,6 +277,6 @@ export class ChatQueueProcessor {
     if (agent?.cliType) {
       return agent.cliType as CliType;
     }
-    return CliType.Claude;
+    return this.defaultCliType;
   }
 }

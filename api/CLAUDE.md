@@ -53,34 +53,42 @@ src/
 ## Modules
 
 ### Core Module (`src/core`)
+
 Foundation layer with shared entities, configuration, and services.
 
 ### Chat Module (`src/chat`)
+
 - **Endpoints**: CRUD for chats and messages
 - **Processing**: Event-driven queue processor for AI execution
 - **Agent Actions**: Handles AI response actions
 
 ### Workspace Module (`src/workspace`)
+
 - **Endpoints**: CRUD for workspaces
 - **Fields**: id, name, description, workingDirectory
 
 ### Agent Module (`src/agent`)
+
 - **Endpoints**: CRUD for agents, reordering within workspaces
 - **Fields**: id, workspaceId, name, description, instruction, cliType, sortOrder
 - **Supported CLI Types**: claude, gemini, codex
 
 ### CLI Module (`src/cli`)
+
 Adapter pattern for multiple AI providers:
+
 - ClaudeAdapter (primary)
 - GeminiAdapter
 - CodexAdapter
 
 ### Event Module (`src/event`)
+
 - TypeORM subscribers emit events on entity changes
 - Processors listen via `@OnEvent()` decorator
 - Constants: `ChatEvents.MESSAGE_CREATED`, `ChatEvents.QUEUE_CREATED`
 
 ### Health Module (`src/health`)
+
 - `GET /api/health` - Returns status of all CLI adapters
 
 ## Database
@@ -89,13 +97,13 @@ Adapter pattern for multiple AI providers:
 
 Located in `src/core/entities/`:
 
-| Entity              | Table          | Purpose                                                                  |
-| ------------------- | -------------- | ------------------------------------------------------------------------ |
-| WorkspaceEntity     | workspaces     | Container for projects (name, description, workingDirectory)             |
-| ChatEntity          | chats          | Chat sessions linked to workspaces (optional agentId, cliType override)  |
-| ChatMessageEntity   | chat_messages  | Messages with actor info (actorType, actorId, text)                      |
-| ChatQueueEntity     | chat_queues    | Processing queue (status: pending/in_progress/completed/failed/cancelled)|
-| AgentEntity         | agents         | AI agents with custom instructions (name, cliType, instruction, sortOrder) |
+| Entity            | Table         | Purpose                                                                    |
+|-------------------|---------------|----------------------------------------------------------------------------|
+| WorkspaceEntity   | workspaces    | Container for projects (name, description, workingDirectory)               |
+| ChatEntity        | chats         | Chat sessions linked to workspaces (optional agentId, cliType override)    |
+| ChatMessageEntity | chat_messages | Messages with actor info (actorType, actorId, text)                        |
+| ChatQueueEntity   | chat_queues   | Processing queue (status: pending/in_progress/completed/failed/cancelled)  |
+| AgentEntity       | agents        | AI agents with custom instructions (name, cliType, instruction, sortOrder) |
 
 ### Relationships
 
@@ -108,6 +116,7 @@ Located in `src/core/entities/`:
 ## API Endpoints
 
 ### Workspaces
+
 - `GET /api/workspaces` - List workspaces (paginated)
 - `POST /api/workspaces` - Create workspace
 - `GET /api/workspaces/:id` - Get workspace
@@ -115,6 +124,7 @@ Located in `src/core/entities/`:
 - `DELETE /api/workspaces/:id` - Delete workspace
 
 ### Chats
+
 - `GET /api/chats?workspace_id=<id>` - List chats (paginated, workspace_id optional)
 - `POST /api/workspaces/:workspaceId/chats` - Create chat (optional body: name, agentId, cliType)
 - `GET /api/chats/:id` - Get chat
@@ -123,10 +133,12 @@ Located in `src/core/entities/`:
 - `POST /api/chats/:id/cancel` - Cancel processing
 
 ### Messages
+
 - `GET /api/chats/:chatId/messages` - List messages
 - `POST /api/chats/:chatId/messages` - Create message (triggers AI processing)
 
 ### Agents
+
 - `GET /api/agents?workspace_id=<id>` - List agents (workspace_id optional)
 - `GET /api/agents/:id` - Get agent
 - `PATCH /api/agents/:id` - Update agent
@@ -138,12 +150,13 @@ Located in `src/core/entities/`:
 
 ### Environment Variables
 
-| Variable                    | Default       | Description                              |
-| --------------------------- | ------------- | ---------------------------------------- |
-| HOST                        | 127.0.0.1     | Server hostname                          |
-| PORT                        | 3456          | Server port                              |
-| KALAMARI_DATA_DIR           | ~/.kalamari   | Data directory (database, logs)          |
-| KALAMARI_PROCESSOR_DISABLED | -             | Set to '1' to disable queue processor    |
+| Variable                       | Default     | Description                              |
+|--------------------------------|-------------|------------------------------------------|
+| HOST                           | 127.0.0.1   | Server hostname                          |
+| PORT                           | 3456        | Server port                              |
+| KALAMARI_DATA_DIR              | ~/.kalamari | Data directory (database, logs)          |
+| KALAMARI_PROCESSOR_DISABLED    | -           | Set to '1' to disable queue processor    |
+| KALAMARI_PROCESSOR_DEFAULT_CLI | claude      | Default CLI type (claude, gemini, codex) |
 
 ## Key Patterns
 
@@ -158,15 +171,6 @@ Located in `src/core/entities/`:
 ## Coding
 
 - Always run `cd .. && make check` after implementing any coding task to verify linting and tests pass.
-
-## Skills
-
-### keep-documents-updated
-After completing any coding task, check if CLAUDE.md needs to be updated to reflect:
-- New modules, entities, or API endpoints
-- Changes to project structure
-- New patterns or conventions
-- Updated configuration options
 
 ## Testing
 
