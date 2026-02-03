@@ -1,5 +1,6 @@
 export class ApiError extends Error {
   constructor(
+    // @ts-expect-error Lorem ipsum dolor sit amet
     public status: number,
     message: string,
   ) {
