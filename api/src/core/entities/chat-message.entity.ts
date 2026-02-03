@@ -2,6 +2,7 @@ import {
   Column,
   CreateDateColumn,
   Entity,
+  Index,
   JoinColumn,
   ManyToOne,
   PrimaryColumn,
@@ -14,6 +15,7 @@ export class ChatMessageEntity {
   @PrimaryColumn()
   id: string;
 
+  @Index()
   @Column({ name: 'chat_id' })
   chatId: string;
 
