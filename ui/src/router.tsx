@@ -1,15 +1,19 @@
+import type { ComponentType } from "react";
 import { createBrowserRouter } from "react-router";
 
-import HomePage from "@/pages/home";
-import NotFoundPage from "@/pages/not-found";
+const lazy =
+  (importFn: () => Promise<{ default: ComponentType }>) => async () => {
+    const { default: Component } = await importFn();
+    return { Component };
+  };
 
 export const router = createBrowserRouter([
   {
     path: "/",
-    element: <HomePage />,
+    lazy: lazy(() => import("@/modules/dashboard/pages/DashboardPage")),
   },
   {
     path: "*",
-    element: <NotFoundPage />,
+    lazy: lazy(() => import("@/modules/core/pages/NotFoundPage")),
   },
 ]);
