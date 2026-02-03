@@ -1,4 +1,5 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
+import { EventEmitter2 } from '@nestjs/event-emitter';
 import { InjectRepository } from '@nestjs/typeorm';
 import { nanoid } from 'nanoid';
 import { FindOptionsWhere, Repository } from 'typeorm';
@@ -6,6 +7,8 @@ import { FindOptionsWhere, Repository } from 'typeorm';
 import { PaginatedResponse } from '../../core/dtos';
 import { TaskEntity } from '../../core/entities/task.entity';
 import { WorkspaceEntity } from '../../core/entities/workspace.entity';
+import { TaskEvents } from '../../event/constants';
+import { TaskQueueCreatedEvent } from '../../event/dtos';
 import { CreateTaskRequestDto, UpdateTaskRequestDto } from '../dtos';
 import { TaskStatus } from '../types';
 
@@ -16,6 +19,7 @@ export class TasksService {
     private readonly taskRepository: Repository<TaskEntity>,
     @InjectRepository(WorkspaceEntity)
     private readonly workspaceRepository: Repository<WorkspaceEntity>,
+    private readonly eventEmitter: EventEmitter2,
   ) {}
 
   async findAll(
@@ -83,7 +87,14 @@ export class TasksService {
       lastActivityAt: new Date(),
     });
 
-    return this.taskRepository.save(task);
+    const savedTask = await this.taskRepository.save(task);
+
+    this.eventEmitter.emit(
+      TaskEvents.QUEUE_CREATED,
+      new TaskQueueCreatedEvent(savedTask.id),
+    );
+
+    return savedTask;
   }
 
   async update(id: string, dto: UpdateTaskRequestDto): Promise<TaskEntity> {

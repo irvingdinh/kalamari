@@ -1,4 +1,5 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
+import { EventEmitter2 } from '@nestjs/event-emitter';
 import { InjectRepository } from '@nestjs/typeorm';
 import { nanoid } from 'nanoid';
 import { Repository } from 'typeorm';
@@ -6,6 +7,8 @@ import { Repository } from 'typeorm';
 import { PaginatedResponse } from '../../core/dtos';
 import { TaskEntity } from '../../core/entities/task.entity';
 import { TaskCommentEntity } from '../../core/entities/task-comment.entity';
+import { TaskEvents } from '../../event/constants';
+import { TaskQueueCreatedEvent } from '../../event/dtos';
 import { CreateTaskCommentRequestDto } from '../dtos';
 import { TaskCommentActorType } from '../types';
 
@@ -16,6 +19,7 @@ export class TaskCommentsService {
     private readonly taskRepository: Repository<TaskEntity>,
     @InjectRepository(TaskCommentEntity)
     private readonly taskCommentRepository: Repository<TaskCommentEntity>,
+    private readonly eventEmitter: EventEmitter2,
   ) {}
 
   async findAllByTask(
@@ -65,6 +69,13 @@ export class TaskCommentsService {
       text: dto.text,
     });
 
-    return this.taskCommentRepository.save(comment);
+    const savedComment = await this.taskCommentRepository.save(comment);
+
+    this.eventEmitter.emit(
+      TaskEvents.QUEUE_CREATED,
+      new TaskQueueCreatedEvent(taskId),
+    );
+
+    return savedComment;
   }
 }

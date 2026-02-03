@@ -6,6 +6,7 @@ import { TaskEntity } from '../core/entities/task.entity';
 import { TaskCommentEntity } from '../core/entities/task-comment.entity';
 import { WorkspaceEntity } from '../core/entities/workspace.entity';
 import { controllers } from './controllers';
+import { processors } from './processors';
 import { services } from './services';
 
 @Module({
@@ -14,6 +15,6 @@ import { services } from './services';
     TypeOrmModule.forFeature([TaskCommentEntity, TaskEntity, WorkspaceEntity]),
   ],
   controllers: [...controllers],
-  providers: [...services],
+  providers: [...processors, ...services],
 })
 export class TaskModule {}
