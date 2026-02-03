@@ -1,5 +1,5 @@
 import type { ComponentType } from "react";
-import { createBrowserRouter } from "react-router";
+import { createBrowserRouter, redirect } from "react-router";
 
 const lazy =
   (importFn: () => Promise<{ default: ComponentType }>) => async () => {
@@ -10,7 +10,11 @@ const lazy =
 export const router = createBrowserRouter([
   {
     path: "/",
-    lazy: lazy(() => import("@/modules/dashboard/pages/DashboardPage")),
+    loader: () => redirect("/workspaces"),
+  },
+  {
+    path: "/workspaces",
+    lazy: lazy(() => import("@/modules/workspace/pages/WorkspacesPage")),
   },
   {
     path: "*",
