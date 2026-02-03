@@ -36,8 +36,12 @@ src/
 │   ├── controllers/     # CRUD endpoints
 │   ├── services/        # Business logic
 │   └── dtos/            # Request/response DTOs
+├── agent/               # Agent management
+│   ├── controllers/     # Agent endpoints
+│   ├── services/        # Business logic
+│   └── dtos/            # Request/response DTOs
 ├── cli/                 # AI CLI adapters
-│   ├── adapters/        # Claude, Gemini, Codex, OpenCode
+│   ├── adapters/        # Claude, Gemini, Codex
 │   └── services/        # CLI registry
 ├── event/               # Event-driven architecture
 │   ├── subscribers/     # TypeORM entity subscribers
@@ -60,12 +64,16 @@ Foundation layer with shared entities, configuration, and services.
 - **Endpoints**: CRUD for workspaces
 - **Fields**: id, name, description, workingDirectory
 
+### Agent Module (`src/agent`)
+- **Endpoints**: CRUD for agents, reordering within workspaces
+- **Fields**: id, workspaceId, name, description, instruction, cliType, sortOrder
+- **Supported CLI Types**: claude, gemini, codex
+
 ### CLI Module (`src/cli`)
 Adapter pattern for multiple AI providers:
 - ClaudeAdapter (primary)
 - GeminiAdapter
 - CodexAdapter
-- OpencodeAdapter
 
 ### Event Module (`src/event`)
 - TypeORM subscribers emit events on entity changes
@@ -87,10 +95,12 @@ Located in `src/core/entities/`:
 | ChatEntity          | chats          | Chat sessions linked to workspaces                                       |
 | ChatMessageEntity   | chat_messages  | Messages with actor info (actorType, actorId, text)                      |
 | ChatQueueEntity     | chat_queues    | Processing queue (status: pending/in_progress/completed/failed/cancelled)|
+| AgentEntity         | agents         | AI agents with custom instructions (name, cliType, instruction, sortOrder) |
 
 ### Relationships
 
 - Workspace → has many → Chats (cascade delete)
+- Workspace → has many → Agents (cascade delete)
 - Chat → has many → Messages (cascade delete)
 - Chat → has many → Queues (cascade delete)
 
@@ -115,6 +125,14 @@ Located in `src/core/entities/`:
 - `GET /api/chats/:chatId/messages` - List messages
 - `POST /api/chats/:chatId/messages` - Create message (triggers AI processing)
 
+### Agents
+- `GET /api/agents?workspace_id=<id>` - List agents (workspace_id optional)
+- `GET /api/agents/:id` - Get agent
+- `PATCH /api/agents/:id` - Update agent
+- `DELETE /api/agents/:id` - Delete agent
+- `POST /api/workspaces/:workspaceId/agents` - Create agent in workspace
+- `PUT /api/workspaces/:workspaceId/agents/reorder` - Reorder workspace agents
+
 ## Configuration
 
 ### Environment Variables
@@ -134,10 +152,20 @@ Located in `src/core/entities/`:
 - **Adapter Pattern**: CLI adapters for AI providers
 - **Event-Driven**: Async processing via EventEmitter
 - **DTO Validation**: class-validator decorators at API boundary
+- **One Controller Per Endpoint**: Each HTTP endpoint has its own controller class with an `invoke()` method
 
 ## Coding
 
 - Always run `cd .. && make check` after implementing any coding task to verify linting and tests pass.
+
+## Skills
+
+### keep-documents-updated
+After completing any coding task, check if CLAUDE.md needs to be updated to reflect:
+- New modules, entities, or API endpoints
+- Changes to project structure
+- New patterns or conventions
+- Updated configuration options
 
 ## Testing
 

@@ -19,7 +19,7 @@ export class IndexController {
   @ApiOperation({
     summary: 'Check API health',
     description:
-      'Returns the health status of all configured CLI adapters (Claude, Codex, Gemini, OpenCode)',
+      'Returns the health status of all configured CLI adapters (Claude, Codex, Gemini)',
   })
   @ApiResponse({
     status: 200,

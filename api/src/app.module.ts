@@ -1,5 +1,6 @@
 import { Module } from '@nestjs/common';
 
+import { AgentModule } from './agent/agent.module';
 import { ChatModule } from './chat/chat.module';
 import { CliModule } from './cli/cli.module';
 import { CoreModule } from './core/core.module';
@@ -9,6 +10,7 @@ import { WorkspaceModule } from './workspace/workspace.module';
 
 @Module({
   imports: [
+    AgentModule,
     ChatModule,
     CliModule,
     CoreModule,

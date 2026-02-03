@@ -1,10 +1,12 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
+import { CLI_TYPE_VALUES } from '../../cli/types';
+
 export class CliHealthStatusResponseDto {
   @ApiProperty({
     description: 'CLI adapter type',
     example: 'claude',
-    enum: ['claude', 'codex', 'gemini', 'opencode'],
+    enum: CLI_TYPE_VALUES,
   })
   type: string;
 

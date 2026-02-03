@@ -2,5 +2,6 @@ export enum CliType {
   Claude = 'claude',
   Codex = 'codex',
   Gemini = 'gemini',
-  Opencode = 'opencode',
 }
+
+export const CLI_TYPE_VALUES = Object.values(CliType);
