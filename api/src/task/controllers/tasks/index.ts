@@ -1,3 +1,4 @@
+import { taskCommentsControllers } from './comments';
 import { DeleteController } from './delete.controller';
 import { IndexController } from './index.controller';
 import { ShowController } from './show.controller';
@@ -8,4 +9,5 @@ export const tasksControllers = [
   IndexController,
   ShowController,
   UpdateController,
+  ...taskCommentsControllers,
 ];

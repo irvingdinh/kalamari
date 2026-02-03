@@ -73,9 +73,10 @@ Foundation layer with shared entities, configuration, and services.
 
 ### Task Module (`src/task`)
 
-- **Endpoints**: CRUD for tasks
+- **Endpoints**: CRUD for tasks, list & create comments per task
 - **Fields**: id, workspaceId, summary, description, status, lastActivityAt
 - **Statuses**: backlog, in_progress, wait_for_review, completed
+- **Comment Actor Types**: user, agent, system
 
 ### Agent Module (`src/agent`)
 
@@ -107,14 +108,15 @@ Adapter pattern for multiple AI providers:
 
 Located in `src/core/entities/`:
 
-| Entity            | Table         | Purpose                                                                    |
-|-------------------|---------------|----------------------------------------------------------------------------|
-| WorkspaceEntity   | workspaces    | Container for projects (name, description, workingDirectory)               |
-| ChatEntity        | chats         | Chat sessions linked to workspaces (optional agentId, cliType override)    |
-| ChatMessageEntity | chat_messages | Messages with actor info (actorType, actorId, text)                        |
-| ChatQueueEntity   | chat_queues   | Processing queue (status: pending/in_progress/completed/failed/cancelled)  |
-| AgentEntity       | agents        | AI agents with custom instructions (name, cliType, instruction, sortOrder) |
-| TaskEntity        | tasks         | Tasks linked to workspaces (summary, description, status, lastActivityAt)  |
+| Entity             | Table          | Purpose                                                                    |
+|--------------------|----------------|----------------------------------------------------------------------------|
+| WorkspaceEntity    | workspaces     | Container for projects (name, description, workingDirectory)               |
+| ChatEntity         | chats          | Chat sessions linked to workspaces (optional agentId, cliType override)    |
+| ChatMessageEntity  | chat_messages  | Messages with actor info (actorType, actorId, text)                        |
+| ChatQueueEntity    | chat_queues    | Processing queue (status: pending/in_progress/completed/failed/cancelled)  |
+| AgentEntity        | agents         | AI agents with custom instructions (name, cliType, instruction, sortOrder) |
+| TaskEntity         | tasks          | Tasks linked to workspaces (summary, description, status, lastActivityAt)  |
+| TaskCommentEntity  | task_comments  | Immutable comments on tasks (actorType, actorId, text)                     |
 
 ### Relationships
 
@@ -124,6 +126,7 @@ Located in `src/core/entities/`:
 - Chat → optional → Agent (SET NULL on delete)
 - Chat → has many → Messages (cascade delete)
 - Chat → has many → Queues (cascade delete)
+- Task → has many → Comments (cascade delete)
 
 ## API Endpoints
 
@@ -156,6 +159,11 @@ Located in `src/core/entities/`:
 - `POST /api/workspaces/:workspaceId/tasks` - Create task (summary required, description optional, status optional defaults to backlog)
 - `PATCH /api/tasks/:id` - Update task (summary, description, status; updates lastActivityAt only on meaningful changes)
 - `DELETE /api/tasks/:id` - Delete task
+
+### Task Comments
+
+- `GET /api/tasks/:taskId/comments` - List comments (paginated, ordered by created_at DESC)
+- `POST /api/tasks/:taskId/comments` - Create comment (text required, actorType defaults to user)
 
 ### Agents
 

@@ -6,3 +6,12 @@ export enum TaskStatus {
 }
 
 export const TASK_STATUS_VALUES = Object.values(TaskStatus);
+
+export enum TaskCommentActorType {
+  USER = 'user',
+  AGENT = 'agent',
+  SYSTEM = 'system',
+}
+
+export const TASK_COMMENT_ACTOR_TYPE_VALUES =
+  Object.values(TaskCommentActorType);
