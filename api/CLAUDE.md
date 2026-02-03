@@ -36,6 +36,10 @@ src/
 │   ├── controllers/     # CRUD endpoints
 │   ├── services/        # Business logic
 │   └── dtos/            # Request/response DTOs
+├── task/                # Task management
+│   ├── controllers/     # CRUD endpoints
+│   ├── services/        # Business logic
+│   └── dtos/            # Request/response DTOs
 ├── agent/               # Agent management
 │   ├── controllers/     # Agent endpoints
 │   ├── services/        # Business logic
@@ -66,6 +70,12 @@ Foundation layer with shared entities, configuration, and services.
 
 - **Endpoints**: CRUD for workspaces
 - **Fields**: id, name, description, workingDirectory
+
+### Task Module (`src/task`)
+
+- **Endpoints**: CRUD for tasks
+- **Fields**: id, workspaceId, summary, description, status, lastActivityAt
+- **Statuses**: backlog, in_progress, wait_for_review, completed
 
 ### Agent Module (`src/agent`)
 
@@ -104,10 +114,12 @@ Located in `src/core/entities/`:
 | ChatMessageEntity | chat_messages | Messages with actor info (actorType, actorId, text)                        |
 | ChatQueueEntity   | chat_queues   | Processing queue (status: pending/in_progress/completed/failed/cancelled)  |
 | AgentEntity       | agents        | AI agents with custom instructions (name, cliType, instruction, sortOrder) |
+| TaskEntity        | tasks         | Tasks linked to workspaces (summary, description, status, lastActivityAt)  |
 
 ### Relationships
 
 - Workspace → has many → Chats (cascade delete)
+- Workspace → has many → Tasks (cascade delete)
 - Workspace → has many → Agents (cascade delete)
 - Chat → optional → Agent (SET NULL on delete)
 - Chat → has many → Messages (cascade delete)
@@ -136,6 +148,14 @@ Located in `src/core/entities/`:
 
 - `GET /api/chats/:chatId/messages` - List messages
 - `POST /api/chats/:chatId/messages` - Create message (triggers AI processing)
+
+### Tasks
+
+- `GET /api/tasks?workspace_id&status&page&limit` - List tasks (paginated, filtered)
+- `GET /api/tasks/:id` - Get task
+- `POST /api/workspaces/:workspaceId/tasks` - Create task (summary required, description optional, status optional defaults to backlog)
+- `PATCH /api/tasks/:id` - Update task (summary, description, status; updates lastActivityAt only on meaningful changes)
+- `DELETE /api/tasks/:id` - Delete task
 
 ### Agents
 
