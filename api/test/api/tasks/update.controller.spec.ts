@@ -5,6 +5,7 @@ import { DataSource } from 'typeorm';
 
 import { TaskEntity } from '../../../src/core/entities/task.entity';
 import { WorkspaceEntity } from '../../../src/core/entities/workspace.entity';
+import { TaskStatus } from '../../../src/task/types';
 import { createTestApp, destroyTestApp, withUrl } from '../../utils';
 
 describe('PATCH /api/tasks/:id', () => {
@@ -41,7 +42,7 @@ describe('PATCH /api/tasks/:id', () => {
       id: nanoid(),
       workspaceId: workspace.id,
       summary: 'Original Summary',
-      status: 'backlog',
+      status: TaskStatus.BACKLOG,
       lastActivityAt: new Date(),
     });
     await taskRepo.save(task);
@@ -60,7 +61,7 @@ describe('PATCH /api/tasks/:id', () => {
       id: nanoid(),
       workspaceId: workspace.id,
       summary: 'Task',
-      status: 'backlog',
+      status: TaskStatus.BACKLOG,
       lastActivityAt: new Date(),
     });
     await taskRepo.save(task);
@@ -79,7 +80,7 @@ describe('PATCH /api/tasks/:id', () => {
       id: nanoid(),
       workspaceId: workspace.id,
       summary: 'Task',
-      status: 'backlog',
+      status: TaskStatus.BACKLOG,
       lastActivityAt: new Date(),
     });
     await taskRepo.save(task);
@@ -99,7 +100,7 @@ describe('PATCH /api/tasks/:id', () => {
       id: nanoid(),
       workspaceId: workspace.id,
       summary: 'Task',
-      status: 'backlog',
+      status: TaskStatus.BACKLOG,
       lastActivityAt: pastDate,
     });
     await taskRepo.save(task);
@@ -109,9 +110,9 @@ describe('PATCH /api/tasks/:id', () => {
     });
 
     expect(res.status).toBe(200);
-    expect(new Date(res.data.lastActivityAt).getTime()).toBeGreaterThan(
-      pastDate.getTime(),
-    );
+    expect(
+      new Date(res.data.lastActivityAt as string).getTime(),
+    ).toBeGreaterThan(pastDate.getTime());
   });
 
   it('should not bump lastActivityAt when no fields change', async () => {
@@ -121,7 +122,7 @@ describe('PATCH /api/tasks/:id', () => {
       id: nanoid(),
       workspaceId: workspace.id,
       summary: 'Task',
-      status: 'backlog',
+      status: TaskStatus.BACKLOG,
       lastActivityAt: pastDate,
     });
     await taskRepo.save(task);
@@ -129,7 +130,7 @@ describe('PATCH /api/tasks/:id', () => {
     const res = await axios.patch(withUrl(`/api/tasks/${task.id}`), {});
 
     expect(res.status).toBe(200);
-    expect(new Date(res.data.lastActivityAt).getTime()).toBe(
+    expect(new Date(res.data.lastActivityAt as string).getTime()).toBe(
       pastDate.getTime(),
     );
   });
@@ -141,18 +142,18 @@ describe('PATCH /api/tasks/:id', () => {
       id: nanoid(),
       workspaceId: workspace.id,
       summary: 'Same Summary',
-      status: 'backlog',
+      status: TaskStatus.BACKLOG,
       lastActivityAt: pastDate,
     });
     await taskRepo.save(task);
 
     const res = await axios.patch(withUrl(`/api/tasks/${task.id}`), {
       summary: 'Same Summary',
-      status: 'backlog',
+      status: TaskStatus.BACKLOG,
     });
 
     expect(res.status).toBe(200);
-    expect(new Date(res.data.lastActivityAt).getTime()).toBe(
+    expect(new Date(res.data.lastActivityAt as string).getTime()).toBe(
       pastDate.getTime(),
     );
   });
@@ -174,7 +175,7 @@ describe('PATCH /api/tasks/:id', () => {
       id: nanoid(),
       workspaceId: workspace.id,
       summary: 'Task',
-      status: 'backlog',
+      status: TaskStatus.BACKLOG,
       lastActivityAt: new Date(),
     });
     await taskRepo.save(task);

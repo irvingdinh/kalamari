@@ -156,4 +156,103 @@ export class DirService {
   getChatQueueLogPath(queueId: string): string {
     return join(this.ensureChatLogsDir(), `chat_queue_${queueId}.log`);
   }
+
+  /**
+   * Gets the path to a task's context file.
+   *
+   * @param taskId - The task ID
+   * @returns The absolute path to the context file (e.g., `/tmp/kalamari/context/task_{taskId}.json`)
+   */
+  getTaskContextPath(taskId: string): string {
+    return join(this.ensureChatContextDir(), `task_${taskId}.json`);
+  }
+
+  /**
+   * Gets the path to a task's comments file.
+   *
+   * @param taskId - The task ID
+   * @returns The absolute path to the comments file (e.g., `/tmp/kalamari/context/task_{taskId}_comments.jsonl`)
+   */
+  getTaskCommentsPath(taskId: string): string {
+    return join(this.ensureChatContextDir(), `task_${taskId}_comments.jsonl`);
+  }
+
+  /**
+   * Gets the path to a task orchestrator's output file.
+   *
+   * @param taskId - The task ID
+   * @param iteration - The orchestrator iteration number
+   * @returns The absolute path to the output file (e.g., `/tmp/kalamari/output/task_{taskId}_orch_{iteration}_output.json`)
+   */
+  getTaskOrchestratorOutputPath(taskId: string, iteration: number): string {
+    return join(
+      this.ensureChatOutputDir(),
+      `task_${taskId}_orch_${iteration}_output.json`,
+    );
+  }
+
+  /**
+   * Gets the path to a task agent's output file.
+   *
+   * @param taskId - The task ID
+   * @param agentId - The agent ID
+   * @param iteration - The orchestrator iteration number
+   * @returns The absolute path to the output file (e.g., `/tmp/kalamari/output/task_{taskId}_agent_{agentId}_{iteration}_output.json`)
+   */
+  getTaskAgentOutputPath(
+    taskId: string,
+    agentId: string,
+    iteration: number,
+  ): string {
+    return join(
+      this.ensureChatOutputDir(),
+      `task_${taskId}_agent_${agentId}_${iteration}_output.json`,
+    );
+  }
+
+  /**
+   * Gets the path to a task orchestrator's log file.
+   *
+   * @param taskId - The task ID
+   * @param iteration - The orchestrator iteration number
+   * @returns The absolute path to the log file (e.g., `/tmp/kalamari/logs/task_{taskId}_orch_{iteration}.log`)
+   */
+  getTaskOrchestratorLogPath(taskId: string, iteration: number): string {
+    return join(
+      this.ensureChatLogsDir(),
+      `task_${taskId}_orch_${iteration}.log`,
+    );
+  }
+
+  /**
+   * Gets the path to a task agent's log file.
+   *
+   * @param taskId - The task ID
+   * @param agentId - The agent ID
+   * @param iteration - The orchestrator iteration number
+   * @returns The absolute path to the log file (e.g., `/tmp/kalamari/logs/task_{taskId}_agent_{agentId}_{iteration}.log`)
+   */
+  getTaskAgentLogPath(
+    taskId: string,
+    agentId: string,
+    iteration: number,
+  ): string {
+    return join(
+      this.ensureChatLogsDir(),
+      `task_${taskId}_agent_${agentId}_${iteration}.log`,
+    );
+  }
+
+  /**
+   * Ensures the task working directory exists, creating it if necessary.
+   * Used as a fallback when workspace.workingDirectory is not set.
+   *
+   * @param taskId - The task ID
+   * @returns The absolute path to the working directory (e.g., `/tmp/kalamari/tasks/{taskId}/`)
+   */
+  ensureTaskWorkDir(taskId: string): string {
+    const dirPath = join(tmpdir(), 'kalamari', 'tasks', taskId);
+    mkdirSync(dirPath, { recursive: true });
+    return dirPath;
+  }
 }

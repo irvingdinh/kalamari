@@ -39,7 +39,10 @@ src/
 ├── task/                # Task management
 │   ├── controllers/     # CRUD endpoints
 │   ├── services/        # Business logic
-│   └── dtos/            # Request/response DTOs
+│   ├── processors/      # Event-driven queue processing
+│   ├── agent-actions/   # AI action handlers for task orchestration
+│   ├── dtos/            # Request/response DTOs
+│   └── types.ts         # TypeScript types
 ├── agent/               # Agent management
 │   ├── controllers/     # Agent endpoints
 │   ├── services/        # Business logic
@@ -47,6 +50,9 @@ src/
 ├── cli/                 # AI CLI adapters
 │   ├── adapters/        # Claude, Gemini, Codex
 │   └── services/        # CLI registry
+├── template/            # Prompt templates
+│   ├── resources/       # Template files (chat, task-orchestrator, task-agent)
+│   └── services/        # Template rendering service
 ├── event/               # Event-driven architecture
 │   ├── subscribers/     # TypeORM entity subscribers
 │   ├── dtos/            # Event payloads
@@ -59,6 +65,8 @@ src/
 ### Core Module (`src/core`)
 
 Foundation layer with shared entities, configuration, and services.
+
+- **DirService**: Manages data directory paths for chats and tasks (getTaskContextPath, getTaskCommentsPath, getTaskOrchestratorOutputPath, getTaskAgentOutputPath, getTaskOrchestratorLogPath, getTaskAgentLogPath, ensureTaskWorkDir)
 
 ### Chat Module (`src/chat`)
 
@@ -77,6 +85,10 @@ Foundation layer with shared entities, configuration, and services.
 - **Fields**: id, workspaceId, summary, description, status, lastActivityAt
 - **Statuses**: backlog, in_progress, wait_for_review, completed
 - **Comment Actor Types**: user, agent, system
+- **Processing**: Event-driven orchestrator loop that coordinates agents to work on tasks
+- **Bootstrap**: `TaskBootstrapService` implements `OnApplicationBootstrap` to reschedule incomplete tasks (backlog/in_progress) on startup
+- **Agent Actions**: Orchestrator actions (comment, change_status, trigger_agent) and agent actions (comment)
+- **System Comments**: Centralized `createSystemComment` in `TaskCommentsService` used by processors and agent actions
 
 ### Agent Module (`src/agent`)
 
@@ -92,11 +104,19 @@ Adapter pattern for multiple AI providers:
 - GeminiAdapter
 - CodexAdapter
 
+### Template Module (`src/template`)
+
+Prompt template resources and rendering:
+
+- `chat-instruction.template.ts` - Chat prompt template
+- `task-orchestrator-instruction.template.ts` - Orchestrator prompt template
+- `task-agent-instruction.template.ts` - Agent prompt template
+
 ### Event Module (`src/event`)
 
 - TypeORM subscribers emit events on entity changes
 - Processors listen via `@OnEvent()` decorator
-- Constants: `ChatEvents.MESSAGE_CREATED`, `ChatEvents.QUEUE_CREATED`
+- Constants: `ChatEvents.MESSAGE_CREATED`, `ChatEvents.QUEUE_CREATED`, `TaskEvents.QUEUE_CREATED`
 
 ### Health Module (`src/health`)
 
@@ -192,7 +212,8 @@ Located in `src/core/entities/`:
 - **Dependency Injection**: Constructor-based DI with `@Injectable()`
 - **Repository Pattern**: TypeORM repositories in services
 - **Adapter Pattern**: CLI adapters for AI providers
-- **Event-Driven**: Async processing via EventEmitter
+- **Event-Driven**: Async processing via EventEmitter (chat queue, task queue)
+- **Agent Actions**: Structured action handlers for AI responses (used by chat and task modules)
 - **DTO Validation**: class-validator decorators at API boundary
 - **One Controller Per Endpoint**: Each HTTP endpoint has its own controller class with an `invoke()` method
 
