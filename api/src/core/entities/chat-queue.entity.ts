@@ -2,7 +2,6 @@ import {
   Column,
   CreateDateColumn,
   Entity,
-  Index,
   JoinColumn,
   ManyToOne,
   PrimaryColumn,
@@ -15,7 +14,6 @@ export class ChatQueueEntity {
   @PrimaryColumn()
   id: string;
 
-  @Index()
   @Column({ name: 'chat_id' })
   chatId: string;
 
@@ -23,7 +21,6 @@ export class ChatQueueEntity {
   @JoinColumn({ name: 'chat_id' })
   chat: ChatEntity;
 
-  @Index()
   @Column({ default: 'pending' })
   status: string;
 

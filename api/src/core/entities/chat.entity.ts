@@ -2,7 +2,6 @@ import {
   Column,
   CreateDateColumn,
   Entity,
-  Index,
   JoinColumn,
   ManyToOne,
   OneToMany,
@@ -20,7 +19,6 @@ export class ChatEntity {
   @PrimaryColumn()
   id: string;
 
-  @Index()
   @Column({ name: 'workspace_id' })
   workspaceId: string;
 
@@ -28,7 +26,6 @@ export class ChatEntity {
   @JoinColumn({ name: 'workspace_id' })
   workspace: WorkspaceEntity;
 
-  @Index()
   @Column({ name: 'agent_id', type: 'text', nullable: true })
   agentId: string | null;
 

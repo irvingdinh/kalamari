@@ -2,7 +2,6 @@ import {
   Column,
   CreateDateColumn,
   Entity,
-  Index,
   JoinColumn,
   ManyToOne,
   PrimaryColumn,
@@ -16,7 +15,6 @@ export class AgentEntity {
   @PrimaryColumn()
   id: string;
 
-  @Index()
   @Column({ name: 'workspace_id' })
   workspaceId: string;
 
