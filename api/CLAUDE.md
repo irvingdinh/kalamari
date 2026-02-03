@@ -115,9 +115,9 @@ Located in `src/core/entities/`:
 
 ### Chats
 - `GET /api/chats?workspace_id=<id>` - List chats (paginated, workspace_id optional)
-- `POST /api/chats` - Create chat
+- `POST /api/workspaces/:workspaceId/chats` - Create chat
 - `GET /api/chats/:id` - Get chat
-- `PUT /api/chats/:id` - Update chat
+- `PATCH /api/chats/:id` - Update chat
 - `DELETE /api/chats/:id` - Delete chat
 - `POST /api/chats/:id/cancel` - Cancel processing
 

@@ -141,7 +141,7 @@ curl -s -X POST http://localhost:3456/api/workspaces/{WORKSPACE_ID}/chats
 
 #### List Chats
 ```bash
-curl -s http://localhost:3456/api/workspaces/{WORKSPACE_ID}/chats
+curl -s "http://localhost:3456/api/chats?workspace_id={WORKSPACE_ID}"
 ```
 **Expected:** Returns paginated list of chats
 

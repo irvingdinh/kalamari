@@ -16,9 +16,10 @@ import { WorkspaceEntity } from '../../core/entities/workspace.entity';
 import { DirService } from '../../core/services/dir.service';
 import { ChatEvents } from '../../event/constants';
 import { ChatQueueCreatedEvent } from '../../event/dtos';
+import { chatInstructionTemplate } from '../../template/resources/chat-instruction.template';
+import { TemplateService } from '../../template/services/template.service';
 import { AgentAction } from '../agent-actions/types';
 import { AgentActionsService } from '../services/agent-actions.service';
-import { chatInstructionTemplate } from '../templates/chat-instruction.template';
 import { ChatContextFile, ChatMessageLine } from '../types';
 
 @Injectable()
@@ -39,6 +40,7 @@ export class ChatQueueProcessor {
     private readonly dirService: DirService,
     private readonly cliRegistryService: CliRegistryService,
     private readonly agentActionsService: AgentActionsService,
+    private readonly templateService: TemplateService,
   ) {
     this.isDisabled =
       this.configService.get<AppConfig>('root')?.processor.disabled ?? false;
@@ -145,22 +147,20 @@ export class ChatQueueProcessor {
       writeFileSync(messagesFilePath, messageLines.join('\n'));
 
       // Step 5: Build instruction from template
-      const instruction = chatInstructionTemplate
-        .replace('$ABS_PATH_TO_CHAT_CONTEXT_FILE', contextFilePath)
-        .replace('$ABS_PATH_TO_CHAT_MESSAGES_FILE', messagesFilePath)
-        .replace(
-          '$LATEST_MESSAGE_OF_USER_AS_JSON',
-          JSON.stringify(
-            {
-              actorType: latestUserMessage.actorType,
-              text: latestUserMessage.text,
-              createdAt: latestUserMessage.createdAt,
-            },
-            null,
-            2,
-          ),
-        )
-        .replace('$ABS_PATH_TO_CHAT_OUTPUT_FILE', outputFilePath);
+      const instruction = this.templateService.render(chatInstructionTemplate, {
+        contextFilePath,
+        messagesFilePath,
+        latestMessageJson: JSON.stringify(
+          {
+            actorType: latestUserMessage.actorType,
+            text: latestUserMessage.text,
+            createdAt: latestUserMessage.createdAt,
+          },
+          null,
+          2,
+        ),
+        outputFilePath,
+      });
 
       // Step 5.5: Write instruction to file
       const inputFilePath = this.dirService.getChatInputPath(chat.id);

@@ -10,7 +10,7 @@ You are being orchestrated by **Kalamari**, a tool that acts as a bridge between
 The following files contain information about this conversation:
 
 ### Chat Context
-**File:** \`$ABS_PATH_TO_CHAT_CONTEXT_FILE\`
+**File:** \`{{contextFilePath}}\`
 
 Contains metadata about the chat and workspace in JSON format:
 \`\`\`json
@@ -21,7 +21,7 @@ Contains metadata about the chat and workspace in JSON format:
 \`\`\`
 
 ### Message History
-**File:** \`$ABS_PATH_TO_CHAT_MESSAGES_FILE\`
+**File:** \`{{messagesFilePath}}\`
 
 Contains the conversation history in JSONL format (one JSON object per line):
 \`\`\`jsonl
@@ -37,7 +37,7 @@ Contains the conversation history in JSONL format (one JSON object per line):
 The latest message from the user that you need to respond to:
 
 \`\`\`json
-$LATEST_MESSAGE_OF_USER_AS_JSON
+{{{latestMessageJson}}}
 \`\`\`
 
 ---
@@ -46,7 +46,7 @@ $LATEST_MESSAGE_OF_USER_AS_JSON
 
 After completing your work, you **must** write your response to the following file so Kalamari can process it and communicate back to the user:
 
-**Output File:** \`$ABS_PATH_TO_CHAT_OUTPUT_FILE\`
+**Output File:** \`{{outputFilePath}}\`
 
 The output must be a valid JSON array of actions:
 
