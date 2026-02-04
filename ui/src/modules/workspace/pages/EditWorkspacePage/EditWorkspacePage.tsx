@@ -1,6 +1,6 @@
 import { LoaderIcon } from "lucide-react";
 import { useState } from "react";
-import { Controller, useForm } from "react-hook-form";
+import { useForm } from "react-hook-form";
 import { Link, useNavigate, useParams } from "react-router";
 
 import {
@@ -17,100 +17,83 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { AppLayout } from "@/modules/core/components/AppLayout";
 import { PageBreadcrumb } from "@/modules/core/components/PageBreadcrumb";
 
-import { useAgent } from "../../hooks/use-agent";
-import { useDeleteAgent } from "../../hooks/use-delete-agent";
-import { useUpdateAgent } from "../../hooks/use-update-agent";
-import type { Agent } from "../../types";
+import { useDeleteWorkspace } from "../../hooks/use-delete-workspace";
+import { useUpdateWorkspace } from "../../hooks/use-update-workspace";
+import { useWorkspace } from "../../hooks/use-workspace";
+import type { Workspace } from "../../types";
 
 interface FormValues {
   name: string;
   description: string;
-  instruction: string;
-  cliType: string;
+  workingDirectory: string;
 }
 
-const CLI_TYPES = [
-  { value: "claude", label: "Claude" },
-  { value: "gemini", label: "Gemini" },
-  { value: "codex", label: "Codex" },
-];
-
-const EditAgentForm = ({
-  agent,
+const EditWorkspaceForm = ({
+  workspace,
   workspaceId,
 }: {
-  agent: Agent;
+  workspace: Workspace;
   workspaceId: string;
 }) => {
   const navigate = useNavigate();
-  const updateAgent = useUpdateAgent();
-  const deleteAgent = useDeleteAgent();
+  const updateWorkspace = useUpdateWorkspace();
+  const deleteWorkspace = useDeleteWorkspace();
   const [deleteOpen, setDeleteOpen] = useState(false);
 
   const {
     register,
     handleSubmit,
-    control,
     formState: { errors, isSubmitting },
   } = useForm<FormValues>({
     defaultValues: {
-      name: agent.name,
-      description: agent.description ?? "",
-      instruction: agent.instruction ?? "",
-      cliType: agent.cliType,
+      name: workspace.name,
+      description: workspace.description ?? "",
+      workingDirectory: workspace.workingDirectory ?? "",
     },
   });
 
   const onSubmit = (data: FormValues) => {
-    updateAgent.mutate(
+    updateWorkspace.mutate(
       {
-        agentId: agent.id,
+        workspaceId: workspace.id,
         name: data.name,
         description: data.description,
-        instruction: data.instruction,
-        cliType: data.cliType,
+        workingDirectory: data.workingDirectory,
       },
       {
-        onSuccess: () => navigate(`/workspaces/${workspaceId}/agents`),
+        onSuccess: () => navigate(`/workspaces/${workspace.id}`),
       },
     );
+  };
+
+  const onDelete = () => {
+    deleteWorkspace.mutate(workspace.id, {
+      onSuccess: () => navigate("/workspaces"),
+    });
   };
 
   return (
     <div className="flex w-full max-w-3xl flex-col gap-6">
       <PageBreadcrumb
         workspaceId={workspaceId}
-        segments={[
-          {
-            label: "Agents",
-            href: `/workspaces/${workspaceId}/agents`,
-          },
-          { label: agent.name },
-        ]}
+        segments={[{ label: "Settings" }]}
       />
 
-      <h2 className="text-lg font-medium">Edit Agent</h2>
+      <h2 className="text-lg font-medium">Edit Workspace</h2>
 
-      {updateAgent.isError && (
+      {updateWorkspace.isError && (
         <div className="text-destructive text-sm">
-          Failed to update agent: {updateAgent.error.message}
+          Failed to update workspace: {updateWorkspace.error.message}
         </div>
       )}
 
-      {deleteAgent.isError && (
+      {deleteWorkspace.isError && (
         <div className="text-destructive text-sm">
-          Failed to delete agent: {deleteAgent.error.message}
+          Failed to delete workspace: {deleteWorkspace.error.message}
         </div>
       )}
 
@@ -119,7 +102,7 @@ const EditAgentForm = ({
           <Label htmlFor="name">Name</Label>
           <Input
             id="name"
-            placeholder="Code Review Assistant"
+            placeholder="My Workspace"
             aria-invalid={!!errors.name}
             {...register("name", {
               required: "Name is required",
@@ -131,32 +114,6 @@ const EditAgentForm = ({
           />
           {errors.name && (
             <p className="text-destructive text-sm">{errors.name.message}</p>
-          )}
-        </div>
-
-        <div className="flex flex-col gap-2">
-          <Label htmlFor="cliType">CLI Type</Label>
-          <Controller
-            name="cliType"
-            control={control}
-            rules={{ required: "CLI type is required" }}
-            render={({ field }) => (
-              <Select value={field.value} onValueChange={field.onChange}>
-                <SelectTrigger id="cliType" aria-invalid={!!errors.cliType}>
-                  <SelectValue placeholder="Select CLI type" />
-                </SelectTrigger>
-                <SelectContent>
-                  {CLI_TYPES.map((type) => (
-                    <SelectItem key={type.value} value={type.value}>
-                      {type.label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            )}
-          />
-          {errors.cliType && (
-            <p className="text-destructive text-sm">{errors.cliType.message}</p>
           )}
         </div>
 
@@ -182,17 +139,21 @@ const EditAgentForm = ({
         </div>
 
         <div className="flex flex-col gap-2">
-          <Label htmlFor="instruction">Instruction</Label>
-          <Textarea
-            id="instruction"
-            placeholder="Optional custom instruction for the agent"
-            rows={5}
-            aria-invalid={!!errors.instruction}
-            {...register("instruction")}
+          <Label htmlFor="workingDirectory">Working Directory</Label>
+          <Input
+            id="workingDirectory"
+            placeholder="/path/to/project"
+            aria-invalid={!!errors.workingDirectory}
+            {...register("workingDirectory", {
+              maxLength: {
+                value: 255,
+                message: "Working directory must be at most 255 characters",
+              },
+            })}
           />
-          {errors.instruction && (
+          {errors.workingDirectory && (
             <p className="text-destructive text-sm">
-              {errors.instruction.message}
+              {errors.workingDirectory.message}
             </p>
           )}
         </div>
@@ -200,12 +161,12 @@ const EditAgentForm = ({
         <div className="flex gap-2">
           <Button
             type="submit"
-            disabled={isSubmitting || updateAgent.isPending}
+            disabled={isSubmitting || updateWorkspace.isPending}
           >
-            {updateAgent.isPending ? "Saving..." : "Save"}
+            {updateWorkspace.isPending ? "Saving..." : "Save"}
           </Button>
           <Button variant="outline" asChild>
-            <Link to={`/workspaces/${workspaceId}/agents`}>Cancel</Link>
+            <Link to={`/workspaces/${workspaceId}`}>Cancel</Link>
           </Button>
 
           <div className="ml-auto">
@@ -214,31 +175,23 @@ const EditAgentForm = ({
                 <Button
                   type="button"
                   variant="destructive"
-                  disabled={deleteAgent.isPending}
+                  disabled={deleteWorkspace.isPending}
                 >
-                  {deleteAgent.isPending ? "Deleting..." : "Delete"}
+                  {deleteWorkspace.isPending ? "Deleting..." : "Delete"}
                 </Button>
               </AlertDialogTrigger>
               <AlertDialogContent>
                 <AlertDialogHeader>
-                  <AlertDialogTitle>Delete Agent</AlertDialogTitle>
+                  <AlertDialogTitle>Delete Workspace</AlertDialogTitle>
                   <AlertDialogDescription>
-                    This will permanently delete this agent. Any chat linked to
-                    this agent will have its agent unlinked. This action cannot
-                    be undone.
+                    This will permanently delete the workspace and all its
+                    associated chats, tasks, and agents. This action cannot be
+                    undone.
                   </AlertDialogDescription>
                 </AlertDialogHeader>
                 <AlertDialogFooter>
                   <AlertDialogCancel>Cancel</AlertDialogCancel>
-                  <AlertDialogAction
-                    variant="destructive"
-                    onClick={() => {
-                      deleteAgent.mutate(agent.id, {
-                        onSuccess: () =>
-                          navigate(`/workspaces/${workspaceId}/agents`),
-                      });
-                    }}
-                  >
+                  <AlertDialogAction variant="destructive" onClick={onDelete}>
                     Delete
                   </AlertDialogAction>
                 </AlertDialogFooter>
@@ -251,12 +204,14 @@ const EditAgentForm = ({
   );
 };
 
-export const EditAgentPage = () => {
-  const { workspaceId, agentId } = useParams<{
-    workspaceId: string;
-    agentId: string;
-  }>();
-  const { data: agent, isLoading, isError, error } = useAgent(agentId!);
+export const EditWorkspacePage = () => {
+  const { workspaceId } = useParams<{ workspaceId: string }>();
+  const {
+    data: workspace,
+    isLoading,
+    isError,
+    error,
+  } = useWorkspace(workspaceId!);
 
   if (isLoading) {
     return (
@@ -272,7 +227,7 @@ export const EditAgentPage = () => {
     return (
       <AppLayout className="flex justify-center p-4">
         <div className="text-destructive flex w-full max-w-3xl justify-center py-8 text-sm">
-          Failed to load agent: {error.message}
+          Failed to load workspace: {error.message}
         </div>
       </AppLayout>
     );
@@ -280,7 +235,7 @@ export const EditAgentPage = () => {
 
   return (
     <AppLayout className="flex justify-center p-4">
-      <EditAgentForm agent={agent!} workspaceId={workspaceId!} />
+      <EditWorkspaceForm workspace={workspace!} workspaceId={workspaceId!} />
     </AppLayout>
   );
 };

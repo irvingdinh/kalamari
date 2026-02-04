@@ -1,11 +1,10 @@
 export class ApiError extends Error {
-  constructor(
-    // @ts-expect-error Lorem ipsum dolor sit amet
-    public status: number,
-    message: string,
-  ) {
+  status: number;
+
+  constructor(status: number, message: string) {
     super(message);
     this.name = "ApiError";
+    this.status = status;
   }
 }
 
@@ -22,7 +21,22 @@ export async function apiClient<T>(
   });
 
   if (!response.ok) {
-    throw new ApiError(response.status, `API error: ${response.status}`);
+    let message = `API error: ${response.status}`;
+    try {
+      const body = await response.json();
+      if (Array.isArray(body.message)) {
+        message = body.message.join(", ");
+      } else if (typeof body.message === "string") {
+        message = body.message;
+      }
+    } catch {
+      // response body is not JSON, use default message
+    }
+    throw new ApiError(response.status, message);
+  }
+
+  if (response.status === 204) {
+    return undefined as T;
   }
 
   return response.json() as Promise<T>;

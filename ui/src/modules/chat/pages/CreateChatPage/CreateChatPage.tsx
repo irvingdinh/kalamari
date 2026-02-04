@@ -11,16 +11,16 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Textarea } from "@/components/ui/textarea";
+import { useWorkspaceAgents } from "@/modules/agent/hooks/use-workspace-agents";
 import { AppLayout } from "@/modules/core/components/AppLayout";
 import { PageBreadcrumb } from "@/modules/core/components/PageBreadcrumb";
 
-import { useCreateAgent } from "../../hooks/use-create-agent";
+import { useCreateChat } from "../../hooks/use-create-chat";
+import type { CliType } from "../../types";
 
 interface FormValues {
   name: string;
-  description: string;
-  instruction: string;
+  agentId: string;
   cliType: string;
 }
 
@@ -30,10 +30,13 @@ const CLI_TYPES = [
   { value: "codex", label: "Codex" },
 ];
 
-export const CreateAgentPage = () => {
+const NONE_VALUE = "__none__";
+
+export const CreateChatPage = () => {
   const { workspaceId } = useParams<{ workspaceId: string }>();
   const navigate = useNavigate();
-  const createAgent = useCreateAgent();
+  const createChat = useCreateChat();
+  const { data: agents } = useWorkspaceAgents(workspaceId!);
 
   const {
     register,
@@ -43,23 +46,23 @@ export const CreateAgentPage = () => {
   } = useForm<FormValues>({
     defaultValues: {
       name: "",
-      description: "",
-      instruction: "",
-      cliType: "claude",
+      agentId: NONE_VALUE,
+      cliType: NONE_VALUE,
     },
   });
 
   const onSubmit = (data: FormValues) => {
-    createAgent.mutate(
+    createChat.mutate(
       {
         workspaceId: workspaceId!,
-        name: data.name,
-        description: data.description || undefined,
-        instruction: data.instruction || undefined,
-        cliType: data.cliType,
+        name: data.name || undefined,
+        agentId: data.agentId !== NONE_VALUE ? data.agentId : undefined,
+        cliType:
+          data.cliType !== NONE_VALUE ? (data.cliType as CliType) : undefined,
       },
       {
-        onSuccess: () => navigate(`/workspaces/${workspaceId}/agents`),
+        onSuccess: (chat) =>
+          navigate(`/workspaces/${workspaceId}/chats/${chat.id}`),
       },
     );
   };
@@ -71,18 +74,18 @@ export const CreateAgentPage = () => {
           workspaceId={workspaceId!}
           segments={[
             {
-              label: "Agents",
-              href: `/workspaces/${workspaceId}/agents`,
+              label: "Chats",
+              href: `/workspaces/${workspaceId}/chats`,
             },
             { label: "Create" },
           ]}
         />
 
-        <h2 className="text-lg font-medium">Create Agent</h2>
+        <h2 className="text-lg font-medium">Create Chat</h2>
 
-        {createAgent.isError && (
+        {createChat.isError && (
           <div className="text-destructive text-sm">
-            Failed to create agent: {createAgent.error.message}
+            Failed to create chat: {createChat.error.message}
           </div>
         )}
 
@@ -91,10 +94,9 @@ export const CreateAgentPage = () => {
             <Label htmlFor="name">Name</Label>
             <Input
               id="name"
-              placeholder="Code Review Assistant"
+              placeholder="Untitled chat"
               aria-invalid={!!errors.name}
               {...register("name", {
-                required: "Name is required",
                 maxLength: {
                   value: 255,
                   message: "Name must be at most 255 characters",
@@ -107,17 +109,40 @@ export const CreateAgentPage = () => {
           </div>
 
           <div className="flex flex-col gap-2">
-            <Label htmlFor="cliType">CLI Type</Label>
+            <Label htmlFor="agentId">Agent (optional)</Label>
+            <Controller
+              name="agentId"
+              control={control}
+              render={({ field }) => (
+                <Select value={field.value} onValueChange={field.onChange}>
+                  <SelectTrigger id="agentId">
+                    <SelectValue placeholder="No agent" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value={NONE_VALUE}>None</SelectItem>
+                    {agents?.map((agent) => (
+                      <SelectItem key={agent.id} value={agent.id}>
+                        {agent.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              )}
+            />
+          </div>
+
+          <div className="flex flex-col gap-2">
+            <Label htmlFor="cliType">CLI Type (optional override)</Label>
             <Controller
               name="cliType"
               control={control}
-              rules={{ required: "CLI type is required" }}
               render={({ field }) => (
                 <Select value={field.value} onValueChange={field.onChange}>
-                  <SelectTrigger id="cliType" aria-invalid={!!errors.cliType}>
-                    <SelectValue placeholder="Select CLI type" />
+                  <SelectTrigger id="cliType">
+                    <SelectValue placeholder="Default" />
                   </SelectTrigger>
                   <SelectContent>
+                    <SelectItem value={NONE_VALUE}>Default</SelectItem>
                     {CLI_TYPES.map((type) => (
                       <SelectItem key={type.value} value={type.value}>
                         {type.label}
@@ -127,59 +152,17 @@ export const CreateAgentPage = () => {
                 </Select>
               )}
             />
-            {errors.cliType && (
-              <p className="text-destructive text-sm">
-                {errors.cliType.message}
-              </p>
-            )}
-          </div>
-
-          <div className="flex flex-col gap-2">
-            <Label htmlFor="description">Description</Label>
-            <Textarea
-              id="description"
-              placeholder="Optional description"
-              rows={3}
-              aria-invalid={!!errors.description}
-              {...register("description", {
-                maxLength: {
-                  value: 1000,
-                  message: "Description must be at most 1000 characters",
-                },
-              })}
-            />
-            {errors.description && (
-              <p className="text-destructive text-sm">
-                {errors.description.message}
-              </p>
-            )}
-          </div>
-
-          <div className="flex flex-col gap-2">
-            <Label htmlFor="instruction">Instruction</Label>
-            <Textarea
-              id="instruction"
-              placeholder="Optional custom instruction for the agent"
-              rows={5}
-              aria-invalid={!!errors.instruction}
-              {...register("instruction")}
-            />
-            {errors.instruction && (
-              <p className="text-destructive text-sm">
-                {errors.instruction.message}
-              </p>
-            )}
           </div>
 
           <div className="flex gap-2">
             <Button
               type="submit"
-              disabled={isSubmitting || createAgent.isPending}
+              disabled={isSubmitting || createChat.isPending}
             >
-              {createAgent.isPending ? "Creating..." : "Create"}
+              {createChat.isPending ? "Creating..." : "Create"}
             </Button>
             <Button variant="outline" asChild>
-              <Link to={`/workspaces/${workspaceId}/agents`}>Cancel</Link>
+              <Link to={`/workspaces/${workspaceId}/chats`}>Cancel</Link>
             </Button>
           </div>
         </form>

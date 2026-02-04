@@ -2,14 +2,14 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 import { apiClient } from "@/lib/api-client";
 
-export function useDeleteAgent() {
+export function useDeleteChat() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (agentId: string) =>
-      apiClient<void>(`/api/agents/${agentId}`, { method: "DELETE" }),
+    mutationFn: (chatId: string) =>
+      apiClient<void>(`/api/chats/${chatId}`, { method: "DELETE" }),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["agents"] });
+      queryClient.invalidateQueries({ queryKey: ["chats"] });
     },
   });
 }

@@ -1,14 +1,14 @@
 import {
   ArrowDownIcon,
   ArrowUpIcon,
+  ChevronRightIcon,
   EllipsisVerticalIcon,
   LoaderIcon,
-  PencilIcon,
   PlusIcon,
   TrashIcon,
 } from "lucide-react";
 import { useState } from "react";
-import { Link, useNavigate, useParams } from "react-router";
+import { Link, useParams } from "react-router";
 
 import {
   AlertDialog,
@@ -40,10 +40,10 @@ import { useReorderAgents } from "@/modules/agent/hooks/use-reorder-agents";
 import { useWorkspaceAgents } from "@/modules/agent/hooks/use-workspace-agents";
 import type { Agent } from "@/modules/agent/types";
 import { AppLayout } from "@/modules/core/components/AppLayout";
+import { PageBreadcrumb } from "@/modules/core/components/PageBreadcrumb";
 
 export const WorkspaceAgentsPage = () => {
   const { workspaceId } = useParams<{ workspaceId: string }>();
-  const navigate = useNavigate();
   const {
     data: agents,
     isLoading,
@@ -79,6 +79,11 @@ export const WorkspaceAgentsPage = () => {
   return (
     <AppLayout className="flex justify-center p-4">
       <div className="flex w-full max-w-3xl flex-col gap-4">
+        <PageBreadcrumb
+          workspaceId={workspaceId!}
+          segments={[{ label: "Agents" }]}
+        />
+
         <div className="flex justify-between">
           <h2 className="text-lg font-medium">Agents</h2>
 
@@ -114,13 +119,18 @@ export const WorkspaceAgentsPage = () => {
           <div className="flex flex-col gap-2">
             {agents.map((agent, index) => (
               <Item variant="outline" key={agent.id}>
-                <ItemContent>
-                  <ItemTitle className="line-clamp-1">{agent.name}</ItemTitle>
-                  <ItemDescription className="line-clamp-1">
-                    {agent.cliType}
-                    {agent.description && ` — ${agent.description}`}
-                  </ItemDescription>
-                </ItemContent>
+                <Link
+                  to={`/workspaces/${workspaceId}/agents/${agent.id}`}
+                  className="flex min-w-0 flex-1 items-center gap-2"
+                >
+                  <ItemContent>
+                    <ItemTitle className="line-clamp-1">{agent.name}</ItemTitle>
+                    <ItemDescription className="line-clamp-1">
+                      {agent.cliType}
+                      {agent.description && ` — ${agent.description}`}
+                    </ItemDescription>
+                  </ItemContent>
+                </Link>
 
                 <ItemActions>
                   <DropdownMenu>
@@ -130,15 +140,13 @@ export const WorkspaceAgentsPage = () => {
                       </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end">
-                      <DropdownMenuItem
-                        onClick={() =>
-                          navigate(
-                            `/workspaces/${workspaceId}/agents/${agent.id}`,
-                          )
-                        }
-                      >
-                        <PencilIcon className="size-4" />
-                        Edit
+                      <DropdownMenuItem asChild>
+                        <Link
+                          to={`/workspaces/${workspaceId}/agents/${agent.id}`}
+                        >
+                          <ChevronRightIcon className="size-4" />
+                          Open
+                        </Link>
                       </DropdownMenuItem>
 
                       <DropdownMenuSeparator />

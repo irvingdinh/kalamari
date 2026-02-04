@@ -2,14 +2,14 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 import { apiClient } from "@/lib/api-client";
 
-export function useDeleteAgent() {
+export function useDeleteTask() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (agentId: string) =>
-      apiClient<void>(`/api/agents/${agentId}`, { method: "DELETE" }),
+    mutationFn: (taskId: string) =>
+      apiClient<void>(`/api/tasks/${taskId}`, { method: "DELETE" }),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["agents"] });
+      queryClient.invalidateQueries({ queryKey: ["tasks"] });
     },
   });
 }

@@ -2,12 +2,12 @@ import {
   ChevronRightIcon,
   EllipsisVerticalIcon,
   LoaderIcon,
-  PencilIcon,
   PlusIcon,
+  SquareIcon,
   TrashIcon,
 } from "lucide-react";
 import { useState } from "react";
-import { Link, useNavigate } from "react-router";
+import { Link, useParams } from "react-router";
 
 import {
   AlertDialog,
@@ -35,12 +35,15 @@ import {
   ItemTitle,
 } from "@/components/ui/item.tsx";
 import { AppLayout } from "@/modules/core/components/AppLayout";
-import { useDeleteWorkspace } from "@/modules/workspace/hooks/use-delete-workspace";
-import { useWorkspaces } from "@/modules/workspace/hooks/use-workspaces";
-import type { Workspace } from "@/modules/workspace/types";
+import { PageBreadcrumb } from "@/modules/core/components/PageBreadcrumb";
 
-export const WorkspacesPage = () => {
-  const navigate = useNavigate();
+import { useCancelChat } from "../../hooks/use-cancel-chat";
+import { useChats } from "../../hooks/use-chats";
+import { useDeleteChat } from "../../hooks/use-delete-chat";
+import type { Chat } from "../../types";
+
+export const WorkspaceChatsPage = () => {
+  const { workspaceId } = useParams<{ workspaceId: string }>();
   const {
     data,
     isLoading,
@@ -49,31 +52,35 @@ export const WorkspacesPage = () => {
     fetchNextPage,
     hasNextPage,
     isFetchingNextPage,
-  } = useWorkspaces();
-  const deleteWorkspace = useDeleteWorkspace();
+  } = useChats({ workspaceId: workspaceId! });
+  const deleteChat = useDeleteChat();
+  const cancelChat = useCancelChat();
 
-  const [workspaceToDelete, setWorkspaceToDelete] = useState<Workspace | null>(
-    null,
-  );
+  const [chatToDelete, setChatToDelete] = useState<Chat | null>(null);
 
-  const workspaces = data?.pages.flatMap((page) => page.data) ?? [];
+  const chats = data?.pages.flatMap((page) => page.data) ?? [];
 
   const handleDelete = () => {
-    if (!workspaceToDelete) return;
-    deleteWorkspace.mutate(workspaceToDelete.id, {
-      onSettled: () => setWorkspaceToDelete(null),
+    if (!chatToDelete) return;
+    deleteChat.mutate(chatToDelete.id, {
+      onSettled: () => setChatToDelete(null),
     });
   };
 
   return (
     <AppLayout className="flex justify-center p-4">
       <div className="flex w-full max-w-3xl flex-col gap-4">
+        <PageBreadcrumb
+          workspaceId={workspaceId!}
+          segments={[{ label: "Chats" }]}
+        />
+
         <div className="flex justify-between">
-          <h2 className="text-lg font-medium">Workspaces</h2>
+          <h2 className="text-lg font-medium">Chats</h2>
 
           <div className="flex gap-2">
             <Button variant="outline" size="sm" asChild>
-              <Link to="/workspaces/create">
+              <Link to={`/workspaces/${workspaceId}/chats/create`}>
                 <PlusIcon className="size-4" />
                 New
               </Link>
@@ -89,33 +96,36 @@ export const WorkspacesPage = () => {
 
         {isError && (
           <div className="text-destructive py-8 text-center text-sm">
-            Failed to load workspaces: {error.message}
+            Failed to load chats: {error.message}
           </div>
         )}
 
-        {!isLoading && !isError && workspaces.length === 0 && (
+        {cancelChat.isError && (
+          <div className="text-destructive text-sm">
+            Failed to cancel chat: {cancelChat.error.message}
+          </div>
+        )}
+
+        {!isLoading && !isError && chats.length === 0 && (
           <div className="text-muted-foreground py-8 text-center text-sm">
-            No workspaces yet.
+            No chats yet.
           </div>
         )}
 
-        {workspaces.length > 0 && (
+        {chats.length > 0 && (
           <div className="flex flex-col gap-2">
-            {workspaces.map((workspace) => (
-              <Item variant="outline" key={workspace.id}>
+            {chats.map((chat) => (
+              <Item variant="outline" key={chat.id}>
                 <Link
-                  to={`/workspaces/${workspace.id}`}
+                  to={`/workspaces/${workspaceId}/chats/${chat.id}`}
                   className="flex min-w-0 flex-1 items-center gap-2"
                 >
                   <ItemContent>
-                    <ItemTitle className="line-clamp-1">
-                      {workspace.name}
-                    </ItemTitle>
-                    {workspace.description && (
-                      <ItemDescription className="line-clamp-1">
-                        {workspace.description}
-                      </ItemDescription>
-                    )}
+                    <ItemTitle className="line-clamp-1">{chat.name}</ItemTitle>
+                    <ItemDescription className="line-clamp-1">
+                      {chat.isProcessing ? "Processing..." : "Idle"}
+                      {chat.cliType && ` — ${chat.cliType}`}
+                    </ItemDescription>
                   </ItemContent>
                 </Link>
 
@@ -128,26 +138,28 @@ export const WorkspacesPage = () => {
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end">
                       <DropdownMenuItem asChild>
-                        <Link to={`/workspaces/${workspace.id}`}>
+                        <Link
+                          to={`/workspaces/${workspaceId}/chats/${chat.id}`}
+                        >
                           <ChevronRightIcon className="size-4" />
                           Open
                         </Link>
                       </DropdownMenuItem>
 
-                      <DropdownMenuItem
-                        onClick={() =>
-                          navigate(`/workspaces/${workspace.id}/settings`)
-                        }
-                      >
-                        <PencilIcon className="size-4" />
-                        Edit
-                      </DropdownMenuItem>
+                      {chat.isProcessing && (
+                        <DropdownMenuItem
+                          onClick={() => cancelChat.mutate(chat.id)}
+                        >
+                          <SquareIcon className="size-4" />
+                          Cancel Processing
+                        </DropdownMenuItem>
+                      )}
 
                       <DropdownMenuSeparator />
 
                       <DropdownMenuItem
                         variant="destructive"
-                        onClick={() => setWorkspaceToDelete(workspace)}
+                        onClick={() => setChatToDelete(chat)}
                       >
                         <TrashIcon className="size-4" />
                         Delete
@@ -175,27 +187,27 @@ export const WorkspacesPage = () => {
       </div>
 
       <AlertDialog
-        open={!!workspaceToDelete}
+        open={!!chatToDelete}
         onOpenChange={(open) => {
-          if (!open) setWorkspaceToDelete(null);
+          if (!open) setChatToDelete(null);
         }}
       >
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Delete Workspace</AlertDialogTitle>
+            <AlertDialogTitle>Delete Chat</AlertDialogTitle>
             <AlertDialogDescription>
-              Are you sure you want to delete "{workspaceToDelete?.name}"? This
-              will also delete all associated chats, tasks, and agents. This
-              action cannot be undone.
+              Are you sure you want to delete "{chatToDelete?.name}"? All
+              messages will be permanently deleted. This action cannot be
+              undone.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Cancel</AlertDialogCancel>
             <AlertDialogAction
               onClick={handleDelete}
-              disabled={deleteWorkspace.isPending}
+              disabled={deleteChat.isPending}
             >
-              {deleteWorkspace.isPending ? "Deleting..." : "Delete"}
+              {deleteChat.isPending ? "Deleting..." : "Delete"}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

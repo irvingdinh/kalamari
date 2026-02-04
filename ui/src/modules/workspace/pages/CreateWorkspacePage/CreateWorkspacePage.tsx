@@ -39,7 +39,8 @@ export const CreateWorkspacePage = () => {
         workingDirectory: data.workingDirectory || undefined,
       },
       {
-        onSuccess: () => navigate("/workspaces"),
+        onSuccess: (workspace) =>
+          navigate(`/workspaces/${workspace.id}`),
       },
     );
   };
