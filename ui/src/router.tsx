@@ -71,6 +71,10 @@ export const router = createBrowserRouter([
     lazy: lazy(() => import("@/modules/health/pages/HealthPage")),
   },
   {
+    path: "/maintenance/events",
+    lazy: lazy(() => import("@/modules/maintenance/pages/EventsPage")),
+  },
+  {
     path: "*",
     lazy: lazy(() => import("@/modules/core/pages/NotFoundPage")),
   },

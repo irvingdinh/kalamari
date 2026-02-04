@@ -1,6 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { OnEvent } from '@nestjs/event-emitter';
+import { EventEmitter2, OnEvent } from '@nestjs/event-emitter';
 import { InjectRepository } from '@nestjs/typeorm';
 import { existsSync, readFileSync, writeFileSync } from 'fs';
 import { nanoid } from 'nanoid';
@@ -15,8 +15,8 @@ import { ChatMessageEntity } from '../../core/entities/chat-message.entity';
 import { ChatQueueEntity } from '../../core/entities/chat-queue.entity';
 import { WorkspaceEntity } from '../../core/entities/workspace.entity';
 import { DirService } from '../../core/services/dir.service';
-import { ChatEvents } from '../../event/constants';
-import { ChatQueueCreatedEvent } from '../../event/dtos';
+import { ChatEvents, DebugEvents } from '../../event/constants';
+import { ChatQueueCreatedEvent, DebugSseMessageDto } from '../../event/dtos';
 import { chatInstructionTemplate } from '../../template/resources/chat-instruction.template';
 import { TemplateService } from '../../template/services/template.service';
 import { AgentAction } from '../agent-actions/types';
@@ -45,6 +45,7 @@ export class ChatQueueProcessor {
     private readonly cliRegistryService: CliRegistryService,
     private readonly agentActionsService: AgentActionsService,
     private readonly templateService: TemplateService,
+    private readonly eventEmitter: EventEmitter2,
   ) {
     const config = this.configService.get<AppConfig>('root')!;
     this.isDisabled = config.processor.disabled ?? false;
@@ -194,10 +195,25 @@ export class ChatQueueProcessor {
         `Executing ${cliType} CLI for queue ${queueId} in ${cwd}, logging to ${logFilePath}`,
       );
 
+      const emitDebug = (stream: string) => (chunk: string) => {
+        const event: DebugSseMessageDto = {
+          type: DebugEvents.CLI_OUTPUT,
+          payload: {
+            source: 'chat-queue',
+            sourceId: queueId,
+            stream,
+            chunk,
+          },
+        };
+        this.eventEmitter.emit(DebugEvents.CLI_OUTPUT, event);
+      };
+
       const result = await adapter.execute({
         stdin: instruction,
         cwd,
         logFilePath,
+        onStdout: emitDebug('stdout'),
+        onStderr: emitDebug('stderr'),
       });
 
       if (result.exitCode !== 0) {

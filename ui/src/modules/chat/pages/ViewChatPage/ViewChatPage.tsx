@@ -396,11 +396,8 @@ const MessageItem = ({
             {new Date(message.createdAt).toLocaleString()}
           </span>
         </div>
-        {isAgent ? (
-          <Markdown className="text-sm">{message.text}</Markdown>
-        ) : (
-          <p className="text-sm whitespace-pre-wrap">{message.text}</p>
-        )}
+
+        <Markdown>{message.text}</Markdown>
       </div>
     </div>
   );

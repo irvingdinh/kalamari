@@ -1,6 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { OnEvent } from '@nestjs/event-emitter';
+import { EventEmitter2, OnEvent } from '@nestjs/event-emitter';
 import { InjectRepository } from '@nestjs/typeorm';
 import { existsSync, readFileSync, writeFileSync } from 'fs';
 import { Repository } from 'typeorm';
@@ -13,8 +13,8 @@ import { TaskEntity } from '../../core/entities/task.entity';
 import { TaskCommentEntity } from '../../core/entities/task-comment.entity';
 import { WorkspaceEntity } from '../../core/entities/workspace.entity';
 import { DirService } from '../../core/services/dir.service';
-import { TaskEvents } from '../../event/constants';
-import { TaskQueueCreatedEvent } from '../../event/dtos';
+import { DebugEvents, TaskEvents } from '../../event/constants';
+import { DebugSseMessageDto, TaskQueueCreatedEvent } from '../../event/dtos';
 import { taskAgentInstructionTemplate } from '../../template/resources/task-agent-instruction.template';
 import { taskOrchestratorInstructionTemplate } from '../../template/resources/task-orchestrator-instruction.template';
 import { TemplateService } from '../../template/services/template.service';
@@ -52,6 +52,7 @@ export class TaskQueueProcessor {
     private readonly agentActionsService: TaskAgentActionsService,
     private readonly taskCommentsService: TaskCommentsService,
     private readonly templateService: TemplateService,
+    private readonly eventEmitter: EventEmitter2,
   ) {
     const config = this.configService.get<AppConfig>('root')!;
     this.isDisabled = config.processor.disabled ?? false;
@@ -222,10 +223,25 @@ export class TaskQueueProcessor {
             `Executing ${this.defaultCliType} CLI for task ${taskId} orchestrator iteration ${iteration} in ${cwd}`,
           );
 
+          const emitOrchestratorDebug = (stream: string) => (chunk: string) => {
+            const event: DebugSseMessageDto = {
+              type: DebugEvents.CLI_OUTPUT,
+              payload: {
+                source: 'task-orchestrator',
+                sourceId: taskId,
+                stream,
+                chunk,
+              },
+            };
+            this.eventEmitter.emit(DebugEvents.CLI_OUTPUT, event);
+          };
+
           const result = await adapter.execute({
             stdin: instruction,
             cwd,
             logFilePath,
+            onStdout: emitOrchestratorDebug('stdout'),
+            onStderr: emitOrchestratorDebug('stderr'),
           });
 
           if (result.exitCode !== 0) {
@@ -422,10 +438,25 @@ export class TaskQueueProcessor {
       `Executing ${cliType} CLI for task ${taskId} agent ${agentId} iteration ${iteration}`,
     );
 
+    const emitAgentDebug = (stream: string) => (chunk: string) => {
+      const event: DebugSseMessageDto = {
+        type: DebugEvents.CLI_OUTPUT,
+        payload: {
+          source: 'task-agent',
+          sourceId: taskId,
+          stream,
+          chunk,
+        },
+      };
+      this.eventEmitter.emit(DebugEvents.CLI_OUTPUT, event);
+    };
+
     const result = await adapter.execute({
       stdin: instruction,
       cwd,
       logFilePath,
+      onStdout: emitAgentDebug('stdout'),
+      onStderr: emitAgentDebug('stderr'),
     });
 
     if (result.exitCode !== 0) {

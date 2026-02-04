@@ -27,6 +27,8 @@ export interface ExecuteOptions {
   stdin: string;
   cwd: string;
   logFilePath?: string;
+  onStdout?: (chunk: string) => void;
+  onStderr?: (chunk: string) => void;
 }
 
 export abstract class CliAdapter {

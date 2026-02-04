@@ -6,6 +6,7 @@ import {
   ListTodoIcon,
   MessageSquareIcon,
   PlusIcon,
+  RadioIcon,
   SettingsIcon,
   UsersIcon,
 } from "lucide-react";
@@ -175,6 +176,14 @@ export const AppSidebar = ({
                   <Link to="/health">
                     <ActivityIcon className="size-4" />
                     System Health
+                  </Link>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+              <SidebarMenuItem>
+                <SidebarMenuButton asChild>
+                  <Link to="/maintenance/events">
+                    <RadioIcon className="size-4" />
+                    Events
                   </Link>
                 </SidebarMenuButton>
               </SidebarMenuItem>

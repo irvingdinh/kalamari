@@ -6,3 +6,7 @@ export const ChatEvents = {
 export const TaskEvents = {
   QUEUE_CREATED: 'task.queue.created',
 } as const;
+
+export const DebugEvents = {
+  CLI_OUTPUT: 'debug.cli.output',
+} as const;

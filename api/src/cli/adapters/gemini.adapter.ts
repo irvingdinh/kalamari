@@ -36,14 +36,20 @@ export class GeminiAdapter extends CliAdapter {
   }
 
   async execute(options: ExecuteOptions): Promise<ExecResult> {
-    const { stdin, cwd, logFilePath } = options;
+    const { stdin, cwd, logFilePath, onStdout, onStderr } = options;
 
     const logFileStream = logFilePath
       ? createWriteStream(logFilePath, { flags: 'w' })
       : undefined;
 
-    const onChunk = (chunk: string) => {
+    const onStdoutChunk = (chunk: string) => {
       if (logFileStream) logFileStream.write(chunk);
+      onStdout?.(chunk);
+    };
+
+    const onStderrChunk = (chunk: string) => {
+      if (logFileStream) logFileStream.write(chunk);
+      onStderr?.(chunk);
     };
 
     try {
@@ -52,8 +58,8 @@ export class GeminiAdapter extends CliAdapter {
         args: ['--yolo', '--output-format', 'stream-json'],
         cwd,
         stdin,
-        onStdout: onChunk,
-        onStderr: onChunk,
+        onStdout: onStdoutChunk,
+        onStderr: onStderrChunk,
       });
     } finally {
       if (logFileStream) logFileStream.end();
