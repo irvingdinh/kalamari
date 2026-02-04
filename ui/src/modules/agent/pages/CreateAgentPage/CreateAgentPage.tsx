@@ -1,9 +1,18 @@
+import { AlertCircleIcon } from "lucide-react";
 import { Controller, useForm } from "react-hook-form";
-import { Link, useNavigate, useParams } from "react-router";
+import { useNavigate, useParams } from "react-router";
 
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
+import {
+  Field,
+  FieldDescription,
+  FieldError,
+  FieldGroup,
+  FieldLabel,
+  FieldSet,
+} from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import {
   Select,
   SelectContent,
@@ -38,7 +47,7 @@ export const CreateAgentPage = () => {
     register,
     handleSubmit,
     control,
-    formState: { errors, isSubmitting },
+    formState: { errors },
   } = useForm<FormValues>({
     defaultValues: {
       name: "",
@@ -48,129 +57,148 @@ export const CreateAgentPage = () => {
     },
   });
 
-  const onSubmit = (data: FormValues) => {
-    createAgent.mutate(
-      {
-        workspaceId: workspaceId!,
-        name: data.name,
-        description: data.description || undefined,
-        instruction: data.instruction || undefined,
-        cliType: data.cliType,
-      },
-      {
-        onSuccess: () =>
-          navigate(`/workspaces/${workspaceId}/agents`),
-      },
-    );
+  const onSubmit = async (data: FormValues) => {
+    await createAgent.mutateAsync({
+      workspaceId: workspaceId!,
+      name: data.name,
+      description: data.description || undefined,
+      instruction: data.instruction || undefined,
+      cliType: data.cliType,
+    });
+
+    navigate(`/workspaces/${workspaceId}/agents`);
   };
 
   return (
-    <AppLayout className="flex justify-center p-4">
-      <div className="flex w-full max-w-3xl flex-col gap-6">
-        <h2 className="text-lg font-medium">Create Agent</h2>
-
-        {createAgent.isError && (
-          <div className="text-destructive text-sm">
-            Failed to create agent: {createAgent.error.message}
-          </div>
-        )}
-
-        <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4">
-          <div className="flex flex-col gap-2">
-            <Label htmlFor="name">Name</Label>
-            <Input
-              id="name"
-              placeholder="Code Review Assistant"
-              aria-invalid={!!errors.name}
-              {...register("name", {
-                required: "Name is required",
-                maxLength: {
-                  value: 255,
-                  message: "Name must be at most 255 characters",
-                },
-              })}
-            />
-            {errors.name && (
-              <p className="text-destructive text-sm">{errors.name.message}</p>
-            )}
-          </div>
-
-          <div className="flex flex-col gap-2">
-            <Label htmlFor="cliType">CLI Type</Label>
-            <Controller
-              name="cliType"
-              control={control}
-              rules={{ required: "CLI type is required" }}
-              render={({ field }) => (
-                <Select value={field.value} onValueChange={field.onChange}>
-                  <SelectTrigger id="cliType" aria-invalid={!!errors.cliType}>
-                    <SelectValue placeholder="Select CLI type" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {CLI_TYPES.map((type) => (
-                      <SelectItem key={type.value} value={type.value}>
-                        {type.label}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+    <AppLayout
+      breadcrumbItems={[
+        { label: "Workspaces", href: "/workspaces" },
+        { label: "Agents", href: `/workspaces/${workspaceId}/agents` },
+        { label: "Create Agent" },
+      ]}
+      title="Create Agent"
+      className="flex justify-center p-4"
+    >
+      <div className="flex w-full max-w-xl flex-col gap-6">
+        <form onSubmit={handleSubmit(onSubmit)}>
+          <FieldSet disabled={createAgent.isPending}>
+            <FieldGroup>
+              {createAgent.isError && (
+                <Alert variant="destructive">
+                  <AlertCircleIcon />
+                  <AlertTitle>Create Agent Failed</AlertTitle>
+                  <AlertDescription>
+                    {createAgent.error.message}
+                  </AlertDescription>
+                </Alert>
               )}
-            />
-            {errors.cliType && (
-              <p className="text-destructive text-sm">
-                {errors.cliType.message}
-              </p>
-            )}
-          </div>
 
-          <div className="flex flex-col gap-2">
-            <Label htmlFor="description">Description</Label>
-            <Textarea
-              id="description"
-              placeholder="Optional description"
-              rows={3}
-              aria-invalid={!!errors.description}
-              {...register("description", {
-                maxLength: {
-                  value: 1000,
-                  message: "Description must be at most 1000 characters",
-                },
-              })}
-            />
-            {errors.description && (
-              <p className="text-destructive text-sm">
-                {errors.description.message}
-              </p>
-            )}
-          </div>
+              <Field>
+                <FieldLabel htmlFor="name">Name</FieldLabel>
+                <Input
+                  id="name"
+                  placeholder="Code Review Assistant"
+                  aria-invalid={!!errors.name}
+                  {...register("name", {
+                    required: "Name is required",
+                    maxLength: {
+                      value: 255,
+                      message: "Name must be at most 255 characters",
+                    },
+                  })}
+                />
+                {errors.name && <FieldError>{errors.name.message}</FieldError>}
+              </Field>
 
-          <div className="flex flex-col gap-2">
-            <Label htmlFor="instruction">Instruction</Label>
-            <Textarea
-              id="instruction"
-              placeholder="Optional custom instruction for the agent"
-              rows={5}
-              aria-invalid={!!errors.instruction}
-              {...register("instruction")}
-            />
-            {errors.instruction && (
-              <p className="text-destructive text-sm">
-                {errors.instruction.message}
-              </p>
-            )}
-          </div>
+              <Field>
+                <FieldLabel htmlFor="cliType">CLI Type</FieldLabel>
+                <Controller
+                  name="cliType"
+                  control={control}
+                  rules={{ required: "CLI type is required" }}
+                  render={({ field }) => (
+                    <Select value={field.value} onValueChange={field.onChange}>
+                      <SelectTrigger
+                        id="cliType"
+                        aria-invalid={!!errors.cliType}
+                      >
+                        <SelectValue placeholder="Select CLI type" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {CLI_TYPES.map((type) => (
+                          <SelectItem key={type.value} value={type.value}>
+                            {type.label}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  )}
+                />
+                {errors.cliType && (
+                  <FieldError>{errors.cliType.message}</FieldError>
+                )}
+              </Field>
 
-          <div className="flex gap-2">
-            <Button
-              type="submit"
-              disabled={isSubmitting || createAgent.isPending}
-            >
-              {createAgent.isPending ? "Creating..." : "Create"}
-            </Button>
-            <Button variant="outline" asChild>
-              <Link to={`/workspaces/${workspaceId}/agents`}>Cancel</Link>
-            </Button>
-          </div>
+              <Field>
+                <FieldLabel htmlFor="description">Description</FieldLabel>
+                <Textarea
+                  id="description"
+                  placeholder="Reviews pull requests for code quality and security best practices"
+                  aria-invalid={!!errors.description}
+                  className="h-24 overflow-y-auto"
+                  {...register("description", {
+                    maxLength: {
+                      value: 1000,
+                      message: "Description must be at most 1000 characters",
+                    },
+                  })}
+                />
+                {errors.description && (
+                  <FieldError>{errors.description.message}</FieldError>
+                )}
+              </Field>
+
+              <Field>
+                <FieldLabel htmlFor="instruction">
+                  System Instruction
+                </FieldLabel>
+                <Textarea
+                  id="instruction"
+                  placeholder="You are a senior code reviewer. Focus on security vulnerabilities, performance issues, and adherence to the project's coding standards."
+                  aria-invalid={!!errors.instruction}
+                  className="h-24 overflow-y-auto"
+                  {...register("instruction")}
+                />
+                <FieldDescription>
+                  Defines the agent's role, expertise, and behavior. This
+                  instruction is included in every prompt sent to the CLI during
+                  chats and tasks.
+                </FieldDescription>
+                {errors.instruction && (
+                  <FieldError>{errors.instruction.message}</FieldError>
+                )}
+              </Field>
+
+              <Field>
+                <div className="flex flex-col-reverse justify-end gap-2 sm:flex-row">
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    className="text-muted-foreground w-full sm:w-auto"
+                    onClick={() =>
+                      navigate(`/workspaces/${workspaceId}/agents`)
+                    }
+                  >
+                    Cancel
+                  </Button>
+
+                  <Button type="submit" className="w-full sm:w-auto">
+                    {createAgent.isPending ? "Creating..." : "Create Agent"}
+                  </Button>
+                </div>
+              </Field>
+            </FieldGroup>
+          </FieldSet>
         </form>
       </div>
     </AppLayout>

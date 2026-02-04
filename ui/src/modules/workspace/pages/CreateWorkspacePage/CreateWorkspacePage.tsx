@@ -137,6 +137,7 @@ export const CreateWorkspacePage = () => {
               <Field>
                 <div className="flex flex-col-reverse justify-end gap-2 sm:flex-row">
                   <Button
+                    type="button"
                     variant="ghost"
                     className="text-muted-foreground w-full sm:w-auto"
                     onClick={() => navigate("/workspaces")}
