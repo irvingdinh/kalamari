@@ -6,6 +6,13 @@ export const CLI_TYPES = [
 
 export type CliType = (typeof CLI_TYPES)[number]["value"];
 
+export const TASK_STATUSES = [
+  { value: "backlog", label: "Backlog" },
+  { value: "in_progress", label: "In Progress" },
+  { value: "wait_for_review", label: "Wait for Review" },
+  { value: "completed", label: "Completed" },
+] as const;
+
 export interface PaginationMeta {
   total: number;
   page: number;

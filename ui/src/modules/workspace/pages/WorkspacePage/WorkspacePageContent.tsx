@@ -49,7 +49,7 @@ export const WorkspacePageContent = ({
             <ChatsContent chats={chats} />
           </div>
 
-          <TasksContent tasks={tasks} />
+          <TasksContent workspaceId={workspace.id} tasks={tasks} />
         </div>
       </div>
     </div>
