@@ -26,8 +26,8 @@ export class TaskEntity {
   @Column({ length: 255 })
   summary: string;
 
-  @Column({ type: 'text', nullable: true })
-  description: string | null;
+  @Column({ type: 'text' })
+  description: string;
 
   @Column({ type: 'text', default: TaskStatus.BACKLOG })
   status: TaskStatus;

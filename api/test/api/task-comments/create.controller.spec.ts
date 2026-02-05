@@ -37,6 +37,7 @@ describe('POST /api/tasks/:taskId/comments', () => {
       id: nanoid(),
       workspaceId: workspace.id,
       summary: 'Test Task',
+      description: 'Test task description',
       status: TaskStatus.BACKLOG,
       lastActivityAt: new Date(),
     });

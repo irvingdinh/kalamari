@@ -37,6 +37,7 @@ describe('GET /api/tasks/:taskId/comments', () => {
       id: nanoid(),
       workspaceId: workspace.id,
       summary: 'Test Task',
+      description: 'Test task description',
       status: TaskStatus.BACKLOG,
       lastActivityAt: new Date(),
     });
@@ -157,6 +158,7 @@ describe('GET /api/tasks/:taskId/comments', () => {
       id: nanoid(),
       workspaceId: workspace.id,
       summary: 'Other Task',
+      description: 'Other task description',
       status: TaskStatus.BACKLOG,
       lastActivityAt: new Date(),
     });

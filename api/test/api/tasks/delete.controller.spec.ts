@@ -42,6 +42,7 @@ describe('DELETE /api/tasks/:id', () => {
       id: nanoid(),
       workspaceId: workspace.id,
       summary: 'Task to delete',
+      description: 'Task to delete description',
       status: TaskStatus.BACKLOG,
       lastActivityAt: new Date(),
     });
@@ -70,6 +71,7 @@ describe('DELETE /api/tasks/:id', () => {
       id: nanoid(),
       workspaceId: workspace.id,
       summary: 'Cascaded Task',
+      description: 'Cascaded task description',
       status: TaskStatus.BACKLOG,
       lastActivityAt: new Date(),
     });

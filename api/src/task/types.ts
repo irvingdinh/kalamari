@@ -21,7 +21,7 @@ export interface TaskContextFile {
     id: string;
     workspaceId: string;
     summary: string;
-    description: string | null;
+    description: string;
     status: string;
     lastActivityAt: Date;
     createdAt: Date;

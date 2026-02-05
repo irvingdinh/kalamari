@@ -42,7 +42,7 @@ export const CreateTaskPage = () => {
     await createTask.mutateAsync({
       workspaceId: workspaceId!,
       summary: data.summary,
-      description: data.description || undefined,
+      description: data.description,
     });
 
     navigate(`/workspaces/${workspaceId}`);
@@ -97,7 +97,9 @@ export const CreateTaskPage = () => {
                   placeholder="Add OAuth2 support with Google and GitHub providers"
                   aria-invalid={!!errors.description}
                   className="h-24 overflow-y-auto"
-                  {...register("description")}
+                  {...register("description", {
+                    required: "Description is required",
+                  })}
                 />
                 {errors.description && (
                   <FieldError>{errors.description.message}</FieldError>

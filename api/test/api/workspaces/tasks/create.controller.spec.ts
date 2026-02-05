@@ -38,13 +38,13 @@ describe('POST /api/workspaces/:workspaceId/tasks', () => {
   it('should create a task with defaults and return 201', async () => {
     const res = await axios.post(
       withUrl(`/api/workspaces/${workspace.id}/tasks`),
-      { summary: 'New Task' },
+      { summary: 'New Task', description: 'New task description' },
     );
 
     expect(res.status).toBe(201);
     expect(res.data.id).toBeDefined();
     expect(res.data.summary).toBe('New Task');
-    expect(res.data.description).toBeNull();
+    expect(res.data.description).toBe('New task description');
     expect(res.data.status).toBe('backlog');
     expect(res.data.workspaceId).toBe(workspace.id);
     expect(res.data.lastActivityAt).toBeDefined();
@@ -71,7 +71,7 @@ describe('POST /api/workspaces/:workspaceId/tasks', () => {
   it('should persist the task in the database', async () => {
     const res = await axios.post(
       withUrl(`/api/workspaces/${workspace.id}/tasks`),
-      { summary: 'Persisted Task' },
+      { summary: 'Persisted Task', description: 'Persisted task description' },
     );
 
     const repo = dataSource.getRepository(TaskEntity);
@@ -85,11 +85,11 @@ describe('POST /api/workspaces/:workspaceId/tasks', () => {
   it('should generate a unique ID for each task', async () => {
     const res1 = await axios.post(
       withUrl(`/api/workspaces/${workspace.id}/tasks`),
-      { summary: 'Task 1' },
+      { summary: 'Task 1', description: 'Description 1' },
     );
     const res2 = await axios.post(
       withUrl(`/api/workspaces/${workspace.id}/tasks`),
-      { summary: 'Task 2' },
+      { summary: 'Task 2', description: 'Description 2' },
     );
 
     expect(res1.data.id).not.toBe(res2.data.id);
@@ -99,6 +99,7 @@ describe('POST /api/workspaces/:workspaceId/tasks', () => {
     try {
       await axios.post(withUrl('/api/workspaces/nonexistent/tasks'), {
         summary: 'Task',
+        description: 'Task description',
       });
       fail('Expected request to fail');
     } catch (error: any) {
@@ -108,7 +109,20 @@ describe('POST /api/workspaces/:workspaceId/tasks', () => {
 
   it('should return 400 when summary is missing', async () => {
     try {
-      await axios.post(withUrl(`/api/workspaces/${workspace.id}/tasks`), {});
+      await axios.post(withUrl(`/api/workspaces/${workspace.id}/tasks`), {
+        description: 'Task description',
+      });
+      fail('Expected request to fail');
+    } catch (error: any) {
+      expect(error.response.status).toBe(400);
+    }
+  });
+
+  it('should return 400 when description is missing', async () => {
+    try {
+      await axios.post(withUrl(`/api/workspaces/${workspace.id}/tasks`), {
+        summary: 'Task without description',
+      });
       fail('Expected request to fail');
     } catch (error: any) {
       expect(error.response.status).toBe(400);
@@ -119,6 +133,7 @@ describe('POST /api/workspaces/:workspaceId/tasks', () => {
     try {
       await axios.post(withUrl(`/api/workspaces/${workspace.id}/tasks`), {
         summary: 'Task',
+        description: 'Task description',
         status: 'invalid',
       });
       fail('Expected request to fail');

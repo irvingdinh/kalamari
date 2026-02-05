@@ -22,13 +22,13 @@ export class CreateTaskRequestDto {
   @MaxLength(255)
   summary: string;
 
-  @ApiPropertyOptional({
+  @ApiProperty({
     description: 'Detailed description of the task',
     example: 'Create a login page with email and password fields',
   })
-  @IsOptional()
+  @IsNotEmpty()
   @IsString()
-  description?: string;
+  description: string;
 
   @ApiPropertyOptional({
     description: 'Status of the task',

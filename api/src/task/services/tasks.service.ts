@@ -82,7 +82,7 @@ export class TasksService {
       id: nanoid(),
       workspaceId,
       summary: dto.summary,
-      description: dto.description ?? null,
+      description: dto.description,
       status: dto.status ?? TaskStatus.BACKLOG,
       lastActivityAt: new Date(),
     });

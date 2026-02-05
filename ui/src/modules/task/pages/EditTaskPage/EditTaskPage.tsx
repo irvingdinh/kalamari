@@ -129,9 +129,7 @@ const EditTaskForm = ({ task }: { task: Task }) => {
                 </Select>
               )}
             />
-            {errors.status && (
-              <FieldError>{errors.status.message}</FieldError>
-            )}
+            {errors.status && <FieldError>{errors.status.message}</FieldError>}
           </Field>
 
           <Field>

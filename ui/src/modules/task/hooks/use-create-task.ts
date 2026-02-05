@@ -7,7 +7,7 @@ import type { Task } from "../types";
 interface CreateTaskInput {
   workspaceId: string;
   summary: string;
-  description?: string;
+  description: string;
 }
 
 async function createTask(input: CreateTaskInput): Promise<Task> {

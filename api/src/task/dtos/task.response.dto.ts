@@ -1,4 +1,4 @@
-import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { ApiProperty } from '@nestjs/swagger';
 
 import { TASK_STATUS_VALUES, TaskStatus } from '../types';
 
@@ -21,12 +21,11 @@ export class TaskResponseDto {
   })
   summary: string;
 
-  @ApiPropertyOptional({
+  @ApiProperty({
     description: 'Detailed description of the task',
     example: 'Create a login page with email and password fields',
-    nullable: true,
   })
-  description: string | null;
+  description: string;
 
   @ApiProperty({
     description: 'Current status of the task',

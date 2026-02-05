@@ -42,6 +42,7 @@ describe('PATCH /api/tasks/:id', () => {
       id: nanoid(),
       workspaceId: workspace.id,
       summary: 'Original Summary',
+      description: 'Original description',
       status: TaskStatus.BACKLOG,
       lastActivityAt: new Date(),
     });
@@ -61,6 +62,7 @@ describe('PATCH /api/tasks/:id', () => {
       id: nanoid(),
       workspaceId: workspace.id,
       summary: 'Task',
+      description: 'Task description',
       status: TaskStatus.BACKLOG,
       lastActivityAt: new Date(),
     });
@@ -80,6 +82,7 @@ describe('PATCH /api/tasks/:id', () => {
       id: nanoid(),
       workspaceId: workspace.id,
       summary: 'Task',
+      description: 'Original description',
       status: TaskStatus.BACKLOG,
       lastActivityAt: new Date(),
     });
@@ -100,6 +103,7 @@ describe('PATCH /api/tasks/:id', () => {
       id: nanoid(),
       workspaceId: workspace.id,
       summary: 'Task',
+      description: 'Task description',
       status: TaskStatus.BACKLOG,
       lastActivityAt: pastDate,
     });
@@ -122,6 +126,7 @@ describe('PATCH /api/tasks/:id', () => {
       id: nanoid(),
       workspaceId: workspace.id,
       summary: 'Task',
+      description: 'Task description',
       status: TaskStatus.BACKLOG,
       lastActivityAt: pastDate,
     });
@@ -142,6 +147,7 @@ describe('PATCH /api/tasks/:id', () => {
       id: nanoid(),
       workspaceId: workspace.id,
       summary: 'Same Summary',
+      description: 'Same description',
       status: TaskStatus.BACKLOG,
       lastActivityAt: pastDate,
     });
@@ -175,6 +181,7 @@ describe('PATCH /api/tasks/:id', () => {
       id: nanoid(),
       workspaceId: workspace.id,
       summary: 'Task',
+      description: 'Task description',
       status: TaskStatus.BACKLOG,
       lastActivityAt: new Date(),
     });
