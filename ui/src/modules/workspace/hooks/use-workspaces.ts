@@ -1,8 +1,9 @@
 import { useInfiniteQuery } from "@tanstack/react-query";
 
 import { apiClient } from "@/lib/api-client";
+import type { PaginatedResponse } from "@/lib/types";
 
-import type { PaginatedResponse, Workspace } from "../types";
+import type { Workspace } from "../types";
 
 const WORKSPACES_QUERY_KEY = ["workspaces"] as const;
 const DEFAULT_LIMIT = 10;

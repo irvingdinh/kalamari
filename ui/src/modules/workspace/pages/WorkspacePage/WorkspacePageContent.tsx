@@ -2,18 +2,22 @@ import { Link } from "react-router";
 
 import { Button } from "@/components/ui/button.tsx";
 import type { Agent } from "@/modules/agent/types.ts";
+import type { Chat } from "@/modules/chat/types.ts";
 import type { Workspace } from "@/modules/workspace/types.ts";
 
 import { AgentsContent } from "./AgentsContent.tsx";
+import { ChatsContent } from "./ChatsContent.tsx";
 
 interface WorkspaceContentProps {
   workspace: Workspace;
   agents: Agent[];
+  chats: Chat[];
 }
 
 export const WorkspacePageContent = ({
   workspace,
   agents,
+  chats,
 }: WorkspaceContentProps) => {
   return (
     <div>
@@ -38,6 +42,7 @@ export const WorkspacePageContent = ({
         <div className="mx-auto flex w-full max-w-3xl flex-col gap-6">
           <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
             <AgentsContent workspaceId={workspace.id} agents={agents} />
+            <ChatsContent chats={chats} />
           </div>
         </div>
       </div>

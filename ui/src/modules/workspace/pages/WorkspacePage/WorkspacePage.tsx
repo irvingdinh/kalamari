@@ -1,6 +1,7 @@
 import { useParams } from "react-router";
 
 import { useWorkspaceAgents } from "@/modules/agent/hooks/use-workspace-agents";
+import { useWorkspaceChats } from "@/modules/chat/hooks/use-workspace-chats";
 import { AppLayout } from "@/modules/core/components/AppLayout";
 import { ErrorIndicator } from "@/modules/core/components/ErrorIndicator";
 import { LoadingIndicator } from "@/modules/core/components/LoadingIndicator";
@@ -13,10 +14,13 @@ export const WorkspacePage = () => {
 
   const workspaceQuery = useWorkspace(workspaceId!);
   const agentsQuery = useWorkspaceAgents(workspaceId!);
+  const chatsQuery = useWorkspaceChats(workspaceId!);
 
-  const isLoading = workspaceQuery.isLoading || agentsQuery.isLoading;
-  const isError = workspaceQuery.isError || agentsQuery.isError;
-  const error = workspaceQuery.error || agentsQuery.error;
+  const isLoading =
+    workspaceQuery.isLoading || agentsQuery.isLoading || chatsQuery.isLoading;
+  const isError =
+    workspaceQuery.isError || agentsQuery.isError || chatsQuery.isError;
+  const error = workspaceQuery.error || agentsQuery.error || chatsQuery.error;
 
   if (isLoading) {
     return (
@@ -40,6 +44,7 @@ export const WorkspacePage = () => {
 
   const workspace = workspaceQuery.data!;
   const agents = agentsQuery.data!;
+  const chats = chatsQuery.data!;
 
   return (
     <AppLayout
@@ -49,7 +54,11 @@ export const WorkspacePage = () => {
       ]}
       title={workspace.name}
     >
-      <WorkspacePageContent workspace={workspace} agents={agents} />
+      <WorkspacePageContent
+        workspace={workspace}
+        agents={agents}
+        chats={chats}
+      />
     </AppLayout>
   );
 };

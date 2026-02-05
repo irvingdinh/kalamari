@@ -1,0 +1,10 @@
+export interface Chat {
+  id: string;
+  workspaceId: string;
+  agentId: string | null;
+  name: string;
+  cliType: string | null;
+  createdAt: string;
+  updatedAt: string;
+  isProcessing: boolean;
+}
