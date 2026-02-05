@@ -77,6 +77,20 @@ export const WorkspaceAgentsPage = () => {
     });
   };
 
+  if (isLoading) {
+    return <LoadingIndicator pageTitle="Agents" />;
+  }
+
+  if (isError) {
+    return (
+      <ErrorIndicator
+        pageTitle="Agents"
+        title="Failed to Load Agents"
+        message={error.message}
+      />
+    );
+  }
+
   return (
     <AppLayout className="flex justify-center p-4">
       <div className="flex w-full max-w-3xl flex-col gap-4">
@@ -93,16 +107,7 @@ export const WorkspaceAgentsPage = () => {
           </div>
         </div>
 
-        {isLoading && <LoadingIndicator />}
-
-        {isError && (
-          <ErrorIndicator
-            title="Failed to Load Agents"
-            message={error.message}
-          />
-        )}
-
-        {!isLoading && !isError && agents?.length === 0 && (
+        {agents?.length === 0 && (
           <div className="text-muted-foreground py-8 text-center text-sm">
             No agents yet.
           </div>

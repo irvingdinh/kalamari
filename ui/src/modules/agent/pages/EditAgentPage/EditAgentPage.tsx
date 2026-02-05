@@ -198,47 +198,16 @@ export const EditAgentPage = () => {
   const { data: agent, isLoading, isError, error } = useAgent(agentId!);
 
   if (isLoading) {
-    return (
-      <AppLayout
-        breadcrumbItems={[
-          {
-            label: workspace?.name ?? "Workspace",
-            href: `/workspaces/${workspaceId}`,
-          },
-          { label: "Agents", href: `/workspaces/${workspaceId}/agents` },
-          { label: "Edit Agent" },
-        ]}
-        title="Edit Agent"
-        className="flex justify-center p-4"
-      >
-        <div className="flex w-full max-w-xl justify-center">
-          <LoadingIndicator />
-        </div>
-      </AppLayout>
-    );
+    return <LoadingIndicator pageTitle="Edit Agent" />;
   }
 
   if (isError) {
     return (
-      <AppLayout
-        breadcrumbItems={[
-          {
-            label: workspace?.name ?? "Workspace",
-            href: `/workspaces/${workspaceId}`,
-          },
-          { label: "Agents", href: `/workspaces/${workspaceId}/agents` },
-          { label: "Edit Agent" },
-        ]}
-        title="Edit Agent"
-        className="flex justify-center p-4"
-      >
-        <div className="flex w-full max-w-xl flex-col gap-6">
-          <ErrorIndicator
-            title="Failed to Load Agent"
-            message={error.message}
-          />
-        </div>
-      </AppLayout>
+      <ErrorIndicator
+        pageTitle="Edit Agent"
+        title="Failed to Load Agent"
+        message={error.message}
+      />
     );
   }
 

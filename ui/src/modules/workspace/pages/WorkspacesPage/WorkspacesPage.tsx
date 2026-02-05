@@ -25,6 +25,20 @@ export const WorkspacesPage = () => {
     isFetchingNextPage,
   } = useWorkspaces();
 
+  if (isLoading) {
+    return <LoadingIndicator pageTitle="Workspaces" />;
+  }
+
+  if (isError) {
+    return (
+      <ErrorIndicator
+        pageTitle="Workspaces"
+        title="Failed to Load Workspaces"
+        message={error.message}
+      />
+    );
+  }
+
   const workspaces = data?.pages.flatMap((page) => page.data) ?? [];
 
   return (
@@ -43,16 +57,7 @@ export const WorkspacesPage = () => {
           </div>
         </div>
 
-        {isLoading && <LoadingIndicator />}
-
-        {isError && (
-          <ErrorIndicator
-            title="Failed to Load Workspaces"
-            message={error.message}
-          />
-        )}
-
-        {!isLoading && !isError && workspaces.length === 0 && (
+        {workspaces.length === 0 && (
           <div className="text-muted-foreground py-8 text-center text-sm">
             No workspaces yet.
           </div>

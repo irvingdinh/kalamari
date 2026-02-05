@@ -20,32 +20,21 @@ export const WorkspacePage = () => {
 
   if (isLoading) {
     return (
-      <AppLayout
+      <LoadingIndicator
+        pageTitle="Workspace"
         breadcrumbItems={[{ label: "Workspace" }]}
-        title="Workspace"
-        className="flex justify-center p-4"
-      >
-        <div className="flex w-full max-w-2xl justify-center">
-          <LoadingIndicator />
-        </div>
-      </AppLayout>
+      />
     );
   }
 
   if (isError) {
     return (
-      <AppLayout
+      <ErrorIndicator
+        pageTitle="Workspace"
         breadcrumbItems={[{ label: "Workspace" }]}
-        title="Workspace"
-        className="flex justify-center p-4"
-      >
-        <div className="flex w-full max-w-2xl flex-col gap-6">
-          <ErrorIndicator
-            title="Failed to Load Workspace"
-            message={error?.message}
-          />
-        </div>
-      </AppLayout>
+        title="Failed to Load Workspace"
+        message={error?.message}
+      />
     );
   }
 
