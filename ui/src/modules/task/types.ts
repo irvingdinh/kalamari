@@ -7,6 +7,13 @@ export const TaskStatus = {
 
 export type TaskStatus = (typeof TaskStatus)[keyof typeof TaskStatus];
 
+export const TaskStatusOptions = [
+  { value: TaskStatus.BACKLOG, label: "Backlog" },
+  { value: TaskStatus.IN_PROGRESS, label: "In Progress" },
+  { value: TaskStatus.WAIT_FOR_REVIEW, label: "Wait for Review" },
+  { value: TaskStatus.COMPLETED, label: "Completed" },
+] as const;
+
 export interface Task {
   id: string;
   workspaceId: string;

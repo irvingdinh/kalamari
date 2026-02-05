@@ -45,6 +45,14 @@ export const router = createBrowserRouter([
     lazy: lazy(() => import("@/modules/task/pages/CreateTaskPage")),
   },
   {
+    path: "/workspaces/:workspaceId/tasks/:taskId",
+    lazy: lazy(() => import("@/modules/task/pages/TaskPage")),
+  },
+  {
+    path: "/workspaces/:workspaceId/tasks/:taskId/edit",
+    lazy: lazy(() => import("@/modules/task/pages/EditTaskPage")),
+  },
+  {
     path: "*",
     lazy: lazy(() => import("@/modules/core/pages/NotFoundPage")),
   },

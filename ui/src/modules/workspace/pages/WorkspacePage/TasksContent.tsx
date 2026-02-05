@@ -40,7 +40,7 @@ export const TasksContent = ({ workspaceId, tasks }: TasksContentProps) => {
         <div className="flex flex-col gap-2">
           {tasks.map((task) => (
             <Item key={task.id} variant="outline" size="sm" asChild>
-              <Link to="#">
+              <Link to={`/workspaces/${workspaceId}/tasks/${task.id}`}>
                 <ItemContent>
                   <ItemTitle>{task.summary}</ItemTitle>
                   <ItemDescription className="line-clamp-1">
