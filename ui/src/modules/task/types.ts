@@ -24,3 +24,21 @@ export interface Task {
   createdAt: string;
   updatedAt: string;
 }
+
+export const TaskCommentActorType = {
+  USER: "user",
+  AGENT: "agent",
+  SYSTEM: "system",
+} as const;
+
+export type TaskCommentActorType =
+  (typeof TaskCommentActorType)[keyof typeof TaskCommentActorType];
+
+export interface TaskComment {
+  id: string;
+  taskId: string;
+  actorType: TaskCommentActorType;
+  actorId: string | null;
+  text: string;
+  createdAt: string;
+}

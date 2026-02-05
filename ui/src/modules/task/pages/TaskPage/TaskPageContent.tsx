@@ -2,12 +2,15 @@ import { Link } from "react-router";
 
 import { Button } from "@/components/ui/button";
 import { Field, FieldLabel } from "@/components/ui/field.tsx";
-import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area.tsx";
+import { ScrollArea } from "@/components/ui/scroll-area.tsx";
 import type { Agent } from "@/modules/agent/types";
 import { CodeBlock } from "@/modules/core/components/CodeBlock";
 import type { Workspace } from "@/modules/workspace/types";
 
+import { AddCommentForm } from "../../components/AddCommentForm";
+import { TaskCommentsList } from "../../components/TaskCommentsList";
 import { TaskStatusBadge } from "../../components/TaskStatusBadge";
+import { useTaskComments } from "../../hooks/use-task-comments";
 import type { Task } from "../../types";
 
 interface TaskPageContentProps {
@@ -16,7 +19,13 @@ interface TaskPageContentProps {
   agents: Agent[];
 }
 
-export const TaskPageContent = ({ task, workspace }: TaskPageContentProps) => {
+export const TaskPageContent = ({
+  task,
+  workspace,
+  agents,
+}: TaskPageContentProps) => {
+  const commentsQuery = useTaskComments(task.id);
+
   return (
     <div>
       <div className="flex w-full items-center justify-start border-b p-4">
@@ -39,16 +48,27 @@ export const TaskPageContent = ({ task, workspace }: TaskPageContentProps) => {
       </div>
 
       <div className="p-4">
-        <div className="mx-auto flex w-full max-w-3xl flex-col">
+        <div className="mx-auto flex w-full max-w-3xl flex-col gap-6">
           <div>
             <Field>
               <FieldLabel>Description</FieldLabel>
               {task.description && (
-                <ScrollArea className="h-64 rounded-lg">
-                  <CodeBlock code={task.description} lang="markdown" />
-                  <ScrollBar orientation="horizontal" />
-                </ScrollArea>
+                <CodeBlock code={task.description} lang="markdown" />
               )}
+            </Field>
+          </div>
+
+          <div>
+            <Field>
+              <FieldLabel>Comments</FieldLabel>
+              <AddCommentForm taskId={task.id} />
+              <ScrollArea className="max-h-64">
+                <TaskCommentsList
+                  comments={commentsQuery.data?.data ?? []}
+                  agents={agents}
+                  isLoading={commentsQuery.isLoading}
+                />
+              </ScrollArea>
             </Field>
           </div>
         </div>

@@ -10,7 +10,7 @@ export function CodeBlock({ code, lang }: CodeBlockProps) {
 
   return (
     <div
-      className="[&_pre]:p-2 [&_pre]:text-xs"
+      className="[&_pre]:rounded [&_pre]:p-2 [&_pre]:text-xs [&_pre]:whitespace-pre-wrap"
       dangerouslySetInnerHTML={{ __html: html }}
     />
   );
