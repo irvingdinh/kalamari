@@ -21,6 +21,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
+import { CLI_TYPES } from "@/lib/types";
 import { AppLayout } from "@/modules/core/components/AppLayout";
 
 import { useCreateAgent } from "../../hooks/use-create-agent";
@@ -31,12 +32,6 @@ interface FormValues {
   instruction: string;
   cliType: string;
 }
-
-const CLI_TYPES = [
-  { value: "claude", label: "Claude" },
-  { value: "gemini", label: "Gemini" },
-  { value: "codex", label: "Codex" },
-];
 
 export const CreateAgentPage = () => {
   const { workspaceId } = useParams<{ workspaceId: string }>();
