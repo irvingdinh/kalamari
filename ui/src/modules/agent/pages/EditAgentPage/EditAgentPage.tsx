@@ -1,4 +1,4 @@
-import { AlertCircleIcon, LoaderIcon } from "lucide-react";
+import { AlertCircleIcon } from "lucide-react";
 import { Controller, useForm } from "react-hook-form";
 import { useNavigate, useParams } from "react-router";
 
@@ -23,6 +23,8 @@ import {
 import { Textarea } from "@/components/ui/textarea";
 import { CLI_TYPES } from "@/lib/types";
 import { AppLayout } from "@/modules/core/components/AppLayout";
+import { ErrorIndicator } from "@/modules/core/components/ErrorIndicator";
+import { LoadingIndicator } from "@/modules/core/components/LoadingIndicator";
 import { useWorkspace } from "@/modules/workspace/hooks/use-workspace";
 
 import { useAgent } from "../../hooks/use-agent";
@@ -209,8 +211,8 @@ export const EditAgentPage = () => {
         title="Edit Agent"
         className="flex justify-center p-4"
       >
-        <div className="flex w-full max-w-xl justify-center py-8">
-          <LoaderIcon className="size-5 animate-spin" />
+        <div className="flex w-full max-w-xl justify-center">
+          <LoadingIndicator />
         </div>
       </AppLayout>
     );
@@ -231,11 +233,10 @@ export const EditAgentPage = () => {
         className="flex justify-center p-4"
       >
         <div className="flex w-full max-w-xl flex-col gap-6">
-          <Alert variant="destructive">
-            <AlertCircleIcon />
-            <AlertTitle>Failed to Load Agent</AlertTitle>
-            <AlertDescription>{error.message}</AlertDescription>
-          </Alert>
+          <ErrorIndicator
+            title="Failed to Load Agent"
+            message={error.message}
+          />
         </div>
       </AppLayout>
     );

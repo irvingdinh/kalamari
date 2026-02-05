@@ -1,4 +1,4 @@
-import { ChevronRightIcon, LoaderIcon, PlusIcon } from "lucide-react";
+import { ChevronRightIcon, PlusIcon } from "lucide-react";
 import { Link } from "react-router";
 
 import { Button } from "@/components/ui/button.tsx";
@@ -10,6 +10,8 @@ import {
   ItemTitle,
 } from "@/components/ui/item.tsx";
 import { AppLayout } from "@/modules/core/components/AppLayout";
+import { ErrorIndicator } from "@/modules/core/components/ErrorIndicator";
+import { LoadingIndicator } from "@/modules/core/components/LoadingIndicator";
 import { useWorkspaces } from "@/modules/workspace/hooks/use-workspaces";
 
 export const WorkspacesPage = () => {
@@ -41,16 +43,13 @@ export const WorkspacesPage = () => {
           </div>
         </div>
 
-        {isLoading && (
-          <div className="flex justify-center py-8">
-            <LoaderIcon className="size-5 animate-spin" />
-          </div>
-        )}
+        {isLoading && <LoadingIndicator />}
 
         {isError && (
-          <div className="text-destructive py-8 text-center text-sm">
-            Failed to load workspaces: {error.message}
-          </div>
+          <ErrorIndicator
+            title="Failed to Load Workspaces"
+            message={error.message}
+          />
         )}
 
         {!isLoading && !isError && workspaces.length === 0 && (

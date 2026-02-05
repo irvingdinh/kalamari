@@ -2,7 +2,6 @@ import {
   ArrowDownIcon,
   ArrowUpIcon,
   EllipsisVerticalIcon,
-  LoaderIcon,
   PencilIcon,
   PlusIcon,
   TrashIcon,
@@ -40,6 +39,8 @@ import { useReorderAgents } from "@/modules/agent/hooks/use-reorder-agents";
 import { useWorkspaceAgents } from "@/modules/agent/hooks/use-workspace-agents";
 import type { Agent } from "@/modules/agent/types";
 import { AppLayout } from "@/modules/core/components/AppLayout";
+import { ErrorIndicator } from "@/modules/core/components/ErrorIndicator";
+import { LoadingIndicator } from "@/modules/core/components/LoadingIndicator";
 
 export const WorkspaceAgentsPage = () => {
   const { workspaceId } = useParams<{ workspaceId: string }>();
@@ -92,16 +93,13 @@ export const WorkspaceAgentsPage = () => {
           </div>
         </div>
 
-        {isLoading && (
-          <div className="flex justify-center py-8">
-            <LoaderIcon className="size-5 animate-spin" />
-          </div>
-        )}
+        {isLoading && <LoadingIndicator />}
 
         {isError && (
-          <div className="text-destructive py-8 text-center text-sm">
-            Failed to load agents: {error.message}
-          </div>
+          <ErrorIndicator
+            title="Failed to Load Agents"
+            message={error.message}
+          />
         )}
 
         {!isLoading && !isError && agents?.length === 0 && (

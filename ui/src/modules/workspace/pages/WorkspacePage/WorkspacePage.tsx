@@ -1,0 +1,66 @@
+import { useParams } from "react-router";
+
+import { useWorkspaceAgents } from "@/modules/agent/hooks/use-workspace-agents";
+import { AppLayout } from "@/modules/core/components/AppLayout";
+import { ErrorIndicator } from "@/modules/core/components/ErrorIndicator";
+import { LoadingIndicator } from "@/modules/core/components/LoadingIndicator";
+import { WorkspacePageContent } from "@/modules/workspace/pages/WorkspacePage/WorkspacePageContent.tsx";
+
+import { useWorkspace } from "../../hooks/use-workspace";
+
+export const WorkspacePage = () => {
+  const { workspaceId } = useParams<{ workspaceId: string }>();
+
+  const workspaceQuery = useWorkspace(workspaceId!);
+  const agentsQuery = useWorkspaceAgents(workspaceId!);
+
+  const isLoading = workspaceQuery.isLoading || agentsQuery.isLoading;
+  const isError = workspaceQuery.isError || agentsQuery.isError;
+  const error = workspaceQuery.error || agentsQuery.error;
+
+  if (isLoading) {
+    return (
+      <AppLayout
+        breadcrumbItems={[{ label: "Workspace" }]}
+        title="Workspace"
+        className="flex justify-center p-4"
+      >
+        <div className="flex w-full max-w-2xl justify-center">
+          <LoadingIndicator />
+        </div>
+      </AppLayout>
+    );
+  }
+
+  if (isError) {
+    return (
+      <AppLayout
+        breadcrumbItems={[{ label: "Workspace" }]}
+        title="Workspace"
+        className="flex justify-center p-4"
+      >
+        <div className="flex w-full max-w-2xl flex-col gap-6">
+          <ErrorIndicator
+            title="Failed to Load Workspace"
+            message={error?.message}
+          />
+        </div>
+      </AppLayout>
+    );
+  }
+
+  const workspace = workspaceQuery.data!;
+  const agents = agentsQuery.data!;
+
+  return (
+    <AppLayout
+      breadcrumbItems={[{ label: workspace.name }]}
+      title={workspace.name}
+      className="flex justify-center p-4"
+    >
+      <div className="flex w-full max-w-2xl flex-col gap-6">
+        <WorkspacePageContent workspace={workspace} agents={agents} />
+      </div>
+    </AppLayout>
+  );
+};
