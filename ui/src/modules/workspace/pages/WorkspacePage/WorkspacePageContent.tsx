@@ -3,21 +3,25 @@ import { Link } from "react-router";
 import { Button } from "@/components/ui/button.tsx";
 import type { Agent } from "@/modules/agent/types.ts";
 import type { Chat } from "@/modules/chat/types.ts";
+import type { Task } from "@/modules/task/types.ts";
 import type { Workspace } from "@/modules/workspace/types.ts";
 
 import { AgentsContent } from "./AgentsContent.tsx";
 import { ChatsContent } from "./ChatsContent.tsx";
+import { TasksContent } from "./TasksContent.tsx";
 
 interface WorkspaceContentProps {
   workspace: Workspace;
   agents: Agent[];
   chats: Chat[];
+  tasks: Task[];
 }
 
 export const WorkspacePageContent = ({
   workspace,
   agents,
   chats,
+  tasks,
 }: WorkspaceContentProps) => {
   return (
     <div>
@@ -44,6 +48,8 @@ export const WorkspacePageContent = ({
             <AgentsContent workspaceId={workspace.id} agents={agents} />
             <ChatsContent chats={chats} />
           </div>
+
+          <TasksContent tasks={tasks} />
         </div>
       </div>
     </div>

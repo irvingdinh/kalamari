@@ -5,6 +5,7 @@ import { useWorkspaceChats } from "@/modules/chat/hooks/use-workspace-chats";
 import { AppLayout } from "@/modules/core/components/AppLayout";
 import { ErrorIndicator } from "@/modules/core/components/ErrorIndicator";
 import { LoadingIndicator } from "@/modules/core/components/LoadingIndicator";
+import { useWorkspaceTasks } from "@/modules/task/hooks/use-workspace-tasks";
 import { WorkspacePageContent } from "@/modules/workspace/pages/WorkspacePage/WorkspacePageContent.tsx";
 
 import { useWorkspace } from "../../hooks/use-workspace";
@@ -15,12 +16,12 @@ export const WorkspacePage = () => {
   const workspaceQuery = useWorkspace(workspaceId!);
   const agentsQuery = useWorkspaceAgents(workspaceId!);
   const chatsQuery = useWorkspaceChats(workspaceId!);
+  const tasksQuery = useWorkspaceTasks(workspaceId!);
 
-  const isLoading =
-    workspaceQuery.isLoading || agentsQuery.isLoading || chatsQuery.isLoading;
-  const isError =
-    workspaceQuery.isError || agentsQuery.isError || chatsQuery.isError;
-  const error = workspaceQuery.error || agentsQuery.error || chatsQuery.error;
+  const queries = [workspaceQuery, agentsQuery, chatsQuery, tasksQuery];
+  const isLoading = queries.some((q) => q.isLoading);
+  const isError = queries.some((q) => q.isError);
+  const error = queries.find((q) => q.error)?.error;
 
   if (isLoading) {
     return (
@@ -45,6 +46,7 @@ export const WorkspacePage = () => {
   const workspace = workspaceQuery.data!;
   const agents = agentsQuery.data!;
   const chats = chatsQuery.data!;
+  const tasks = tasksQuery.data!;
 
   return (
     <AppLayout
@@ -58,6 +60,7 @@ export const WorkspacePage = () => {
         workspace={workspace}
         agents={agents}
         chats={chats}
+        tasks={tasks}
       />
     </AppLayout>
   );
