@@ -21,6 +21,10 @@ export const router = createBrowserRouter([
     lazy: lazy(() => import("@/modules/workspace/pages/WorkspacePage")),
   },
   {
+    path: "/workspaces/:workspaceId/edit",
+    lazy: lazy(() => import("@/modules/workspace/pages/EditWorkspacePage")),
+  },
+  {
     path: "/workspaces/create",
     lazy: lazy(() => import("@/modules/workspace/pages/CreateWorkspacePage")),
   },

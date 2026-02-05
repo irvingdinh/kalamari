@@ -1,4 +1,4 @@
-import { Checkbox } from "@/components/ui/checkbox"
+import { Checkbox } from "@/components/ui/checkbox";
 import {
   Field,
   FieldDescription,
@@ -6,7 +6,7 @@ import {
   FieldLabel,
   FieldSeparator,
   FieldSet,
-} from "@/components/ui/field"
+} from "@/components/ui/field";
 
 export default function FieldGroupExample() {
   return (
@@ -51,5 +51,5 @@ export default function FieldGroupExample() {
         </FieldSet>
       </FieldGroup>
     </div>
-  )
+  );
 }

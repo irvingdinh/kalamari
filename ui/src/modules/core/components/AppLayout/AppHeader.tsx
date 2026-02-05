@@ -77,7 +77,7 @@ export const AppHeader = ({
           </Breadcrumb>
         )}
 
-        <div className="ml-auto px-3">
+        <div className="ml-auto">
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" size="icon" className="h-7 w-7">

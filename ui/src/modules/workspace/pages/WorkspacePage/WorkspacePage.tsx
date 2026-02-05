@@ -43,13 +43,13 @@ export const WorkspacePage = () => {
 
   return (
     <AppLayout
-      breadcrumbItems={[{ label: workspace.name }]}
+      breadcrumbItems={[
+        { label: "Workspaces", href: "/workspaces" },
+        { label: workspace.name },
+      ]}
       title={workspace.name}
-      className="flex justify-center p-4"
     >
-      <div className="flex w-full max-w-2xl flex-col gap-6">
-        <WorkspacePageContent workspace={workspace} agents={agents} />
-      </div>
+      <WorkspacePageContent workspace={workspace} agents={agents} />
     </AppLayout>
   );
 };
