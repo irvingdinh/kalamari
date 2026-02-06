@@ -10,13 +10,16 @@ import {
   SidebarMenuItem,
   SidebarRail,
 } from "@/components/ui/sidebar.tsx";
+import { QuickAccess } from "@/modules/workspace/components/QuickAccess";
 
 export const AppSidebar = ({
   ...props
 }: React.ComponentProps<typeof Sidebar>) => {
   return (
     <Sidebar {...props}>
-      <SidebarContent />
+      <SidebarContent>
+        <QuickAccess />
+      </SidebarContent>
 
       <SidebarFooter>
         <SidebarMenu>

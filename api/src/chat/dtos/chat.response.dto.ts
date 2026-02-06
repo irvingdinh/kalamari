@@ -1,5 +1,7 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
+import { WorkspaceResponseDto } from '../../workspace/dtos';
+
 export class ChatResponseDto {
   @ApiProperty({
     description: 'Unique chat identifier',
@@ -55,4 +57,11 @@ export class ChatWithProcessingResponseDto extends ChatResponseDto {
     example: false,
   })
   isProcessing: boolean;
+
+  @ApiPropertyOptional({
+    description:
+      'Workspace details. Only included when include=workspace is specified.',
+    type: WorkspaceResponseDto,
+  })
+  workspace?: WorkspaceResponseDto;
 }

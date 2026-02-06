@@ -1,3 +1,8 @@
+export interface ChatWorkspace {
+  id: string;
+  name: string;
+}
+
 export interface Chat {
   id: string;
   workspaceId: string;
@@ -7,4 +12,5 @@ export interface Chat {
   createdAt: string;
   updatedAt: string;
   isProcessing: boolean;
+  workspace?: ChatWorkspace;
 }

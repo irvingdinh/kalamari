@@ -33,7 +33,7 @@ describe('GET /api/workspaces', () => {
         meta: {
           total: 0,
           page: 1,
-          limit: 10,
+          limit: 100,
           totalPages: 0,
         },
       });

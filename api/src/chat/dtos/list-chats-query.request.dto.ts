@@ -12,4 +12,13 @@ export class ListChatsQueryRequestDto extends PaginationQueryRequestDto {
   @IsOptional()
   @IsString()
   workspace_id?: string;
+
+  @ApiPropertyOptional({
+    description:
+      'Comma-separated list of relations to include. Supported: workspace.',
+    example: 'workspace',
+  })
+  @IsOptional()
+  @IsString()
+  include?: string;
 }

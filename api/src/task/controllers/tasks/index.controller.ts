@@ -30,6 +30,7 @@ export class IndexController {
       query.limit,
       query.workspace_id,
       query.status,
+      query.include,
     );
   }
 }

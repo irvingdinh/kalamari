@@ -24,9 +24,10 @@ export class TasksService {
 
   async findAll(
     page: number = 1,
-    limit: number = 10,
+    limit: number = 100,
     workspaceId?: string,
     status?: TaskStatus,
+    include?: string,
   ): Promise<PaginatedResponse<TaskEntity>> {
     const whereClause: FindOptionsWhere<TaskEntity> = {};
 
@@ -37,8 +38,15 @@ export class TasksService {
       whereClause.status = status;
     }
 
+    const includes = include?.split(',').map((s) => s.trim()) ?? [];
+    const relations: string[] = [];
+    if (includes.includes('workspace')) {
+      relations.push('workspace');
+    }
+
     const [data, total] = await this.taskRepository.findAndCount({
       where: whereClause,
+      relations: relations.length > 0 ? relations : undefined,
       skip: (page - 1) * limit,
       take: limit,
       order: { lastActivityAt: 'DESC' },

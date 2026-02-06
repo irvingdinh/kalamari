@@ -27,6 +27,7 @@ export class IndexController {
       query.page,
       query.limit,
       query.workspace_id,
+      query.include,
     );
   }
 }

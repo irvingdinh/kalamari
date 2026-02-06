@@ -1,5 +1,6 @@
-import { ApiProperty } from '@nestjs/swagger';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
+import { WorkspaceResponseDto } from '../../workspace/dtos';
 import { TASK_STATUS_VALUES, TaskStatus } from '../types';
 
 export class TaskResponseDto {
@@ -54,4 +55,11 @@ export class TaskResponseDto {
     format: 'date-time',
   })
   updatedAt: Date;
+
+  @ApiPropertyOptional({
+    description:
+      'Workspace details. Only included when include=workspace is specified.',
+    type: WorkspaceResponseDto,
+  })
+  workspace?: WorkspaceResponseDto;
 }

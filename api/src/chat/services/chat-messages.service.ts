@@ -29,7 +29,7 @@ export class ChatMessagesService {
   async findAllByChat(
     chatId: string,
     page: number = 1,
-    limit: number = 10,
+    limit: number = 100,
   ): Promise<PaginatedResponse<ChatMessageEntity>> {
     const chat = await this.chatRepository.findOne({ where: { id: chatId } });
     if (!chat) {

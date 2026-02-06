@@ -16,7 +16,7 @@ export class WorkspacesService {
 
   async findAll(
     page: number = 1,
-    limit: number = 10,
+    limit: number = 100,
   ): Promise<PaginatedResponse<WorkspaceEntity>> {
     const [data, total] = await this.workspaceRepository.findAndCount({
       skip: (page - 1) * limit,

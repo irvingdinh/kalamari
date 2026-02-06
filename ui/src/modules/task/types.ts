@@ -14,6 +14,11 @@ export const TaskStatusOptions = [
   { value: TaskStatus.COMPLETED, label: "Completed" },
 ] as const;
 
+export interface TaskWorkspace {
+  id: string;
+  name: string;
+}
+
 export interface Task {
   id: string;
   workspaceId: string;
@@ -23,6 +28,7 @@ export interface Task {
   lastActivityAt: string;
   createdAt: string;
   updatedAt: string;
+  workspace?: TaskWorkspace;
 }
 
 export const TaskCommentActorType = {

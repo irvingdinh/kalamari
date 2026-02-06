@@ -19,13 +19,13 @@ export class PaginationQueryRequestDto {
     description: 'Number of items per page',
     minimum: 1,
     maximum: 100,
-    default: 10,
-    example: 10,
+    default: 100,
+    example: 100,
   })
   @IsOptional()
   @Type(() => Number)
   @IsInt()
   @Min(1)
   @Max(100)
-  limit: number = 10;
+  limit: number = 100;
 }

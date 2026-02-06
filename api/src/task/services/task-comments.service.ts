@@ -25,7 +25,7 @@ export class TaskCommentsService {
   async findAllByTask(
     taskId: string,
     page: number = 1,
-    limit: number = 10,
+    limit: number = 100,
   ): Promise<PaginatedResponse<TaskCommentEntity>> {
     const task = await this.taskRepository.findOne({ where: { id: taskId } });
 

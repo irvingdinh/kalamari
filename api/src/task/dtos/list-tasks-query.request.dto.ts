@@ -22,4 +22,13 @@ export class ListTasksQueryRequestDto extends PaginationQueryRequestDto {
   @IsOptional()
   @IsEnum(TaskStatus)
   status?: TaskStatus;
+
+  @ApiPropertyOptional({
+    description:
+      'Comma-separated list of relations to include. Supported: workspace.',
+    example: 'workspace',
+  })
+  @IsOptional()
+  @IsString()
+  include?: string;
 }
